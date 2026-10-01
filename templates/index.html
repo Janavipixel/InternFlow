@@ -1,1 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Pathfinder — Internship Automation Engine</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="app-shell">
+
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-mark">
+                    P
+                </div>
+
+                <div>
+                    <h1>Pathfinder</h1>
+                    <span>Internship Engine</span>
+                </div>
+            </div>
+
+
+            <nav class="main-nav">
+
+                <p class="nav-label">Workspace</p>
+
+                <button class="nav-item active" data-section="overview">
+                    <span class="nav-icon">⌂</span>
+                    <span>Overview</span>
+                </button>
+
+                <button class="nav-item" data-section="discover">
+                    <span class="nav-icon">⌕</span>
+                    <span>Discover</span>
+                </button>
+
+                <button class="nav-item" data-section="saved">
+                    <span class="nav-icon">♡</span>
+                    <span>Saved</span>
+                    <span class="nav-count" id="savedCount">3</span>
+                </button>
+
+                <button class="nav-item" data-section="applications">
+                    <span class="nav-icon">✓</span>
+                    <span>Applications</span>
+                </button>
+
+                <p class="nav-label second-label">Account</p>
+
+                <button class="nav-item" data-section="profile">
+                    <span class="nav-icon">○</span>
+                    <span>My Profile</span>
+                </button>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="automation-status">
+                    <div class="status-dot"></div>
+
+                    <div>
+                        <strong>Automation active</strong>
+                        <span>Last checked 18 min ago</span>
+                    </div>
+                </div>
+
+                <div class="user-mini">
+
+                    <div class="avatar">
+                        AR
+                    </div>
+
+                    <div class="user-mini-info">
+                        <strong>Alex Rao</strong>
+                        <span>Computer Science</span>
+                    </div>
+
+                    <button class="more-button" aria-label="More options">
+                        ···
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             MAIN CONTENT
+        ========================== -->
+
+        <main class="main-content">
+
+            <!-- TOP BAR -->
+
+            <header class="topbar">
+
+                <div class="mobile-brand">
+                    <div class="brand-mark">P</div>
+                    <strong>Pathfinder</strong>
+                </div>
+
+                <div class="topbar-right">
+
+                    <button class="icon-button notification-button" aria-label="Notifications">
+                        ♢
+                        <span class="notification-dot"></span>
+                    </button>
+
+                    <div class="topbar-divider"></div>
+
+                    <div class="profile-shortcut">
+                        <div class="avatar small-avatar">AR</div>
+
+                        <div>
+                            <strong>Alex Rao</strong>
+                            <span>Student</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- =========================
+                 OVERVIEW SECTION
+            ========================== -->
+
+            <section class="page-section active-section" id="overview">
+
+                <div class="page-heading">
+
+                    <div>
+                        <span class="eyebrow">THURSDAY, OCTOBER 1</span>
+
+                        <h2>Good evening, Alex.</h2>
+
+                        <p>
+                            Your internship search is moving along.
+                            Here are the opportunities worth your attention.
+                        </p>
+                    </div>
+
+                    <button class="primary-button" id="discoverButton">
+                        <span>+</span>
+                        Discover internships
+                    </button>
+
+                </div>
+
+
+                <!-- STAT CARDS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>New matches</span>
+                            <div class="stat-icon amber">✦</div>
+                        </div>
+
+                        <strong class="stat-number">12</strong>
+
+                        <div class="stat-footer positive">
+                            <span>↑ 4</span>
+                            <span>since yesterday</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Strong matches</span>
+                            <div class="stat-icon teal">◎</div>
+                        </div>
+
+                        <strong class="stat-number">5</strong>
+
+                        <div class="stat-footer">
+                            <span>Above 75%</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Applications</span>
+                            <div class="stat-icon navy">↗</div>
+                        </div>
+
+                        <strong class="stat-number">7</strong>
+
+                        <div class="stat-footer">
+                            <span>2 interviews</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Deadlines</span>
+                            <div class="stat-icon red">!</div>
+                        </div>
+
+                        <strong class="stat-number">2</strong>
+
+                        <div class="stat-footer warning">
+                            <span>Within 7 days</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MAIN DASHBOARD GRID -->
+
+                <div class="dashboard-grid">
+
+                    <!-- OPPORTUNITIES -->
+
+                    <div class="content-panel opportunities-panel">
+
+                        <div class="panel-heading">
+
+                            <div>
+                                <span class="panel-kicker">RECOMMENDED</span>
+                                <h3>Opportunities for you</h3>
+                            </div>
+
+                            <button class="text-button" data-section-target="discover">
+                                View all →
+                            </button>
+
+                        </div>
+
+
+                        <div class="internship-list" id="overviewInternships">
+
+                            <!-- Internship 1 -->
+
+                            <article class="internship-row">
+
+                                <div class="company-logo logo-blue">
+                                    N
+                                </div>
+
+                                <div class="internship-main">
+
+                                    <div class="internship-title-line">
+                                        <h4>Frontend Engineering Intern</h4>
+                                        <span class="match-badge">92% match</span>
+                                    </div>
+
+                                    <p class="company-name">Northstar Labs</p>
+
+                                    <div class="internship-meta">
+                                        <span>⌖ Remote</span>
+                                        <span>◷ 4 months</span>
+                                        <span>₹18,000 / month</span>
+                                    </div>
+
+                                </div>
+
+                                <button class="save-button saved" aria-label="Save internship">
+                                    ♥
+                                </button>
+
+                            </article>
+
+
+                            <!-- Internship 2 -->
+
+                            <article class="internship-row">
+
+                                <div class="company-logo logo-green">
+                                    A
+                                </div>
+
+                                <div class="internship-main">
+
+                                    <div class="internship-title-line">
+                                        <h4>Python Developer Intern</h4>
+                                        <span class="match-badge">86% match</span>
+                                    </div>
+
+                                    <p class="company-name">Atlas Systems</p>
+
+                                    <div class="internship-meta">
+                                        <span>⌖ Mumbai</span>
+                                        <span>◷ 6 months</span>
+                                        <span>₹15,000 / month</span>
+                                    </div>
+
+                                </div>
+
+                                <button class="save-button" aria-label="Save internship">
+                                    ♡
+                                </button>
+
+                            </article>
+
+
+                            <!-- Internship 3 -->
+
+                            <article class="internship-row">
+
+                                <div class="company-logo logo-orange">
+                                    V
+                                </div>
+
+                                <div class="internship-main">
+
+                                    <div class="internship-title-line">
+                                        <h4>Product Engineering Intern</h4>
+                                        <span class="match-badge">81% match</span>
+                                    </div>
+
+                                    <p class="company-name">Vertex Works</p>
+
+                                    <div class="internship-meta">
+                                        <span>⌖ Bengaluru</span>
+                                        <span>◷ 5 months</span>
+                                        <span>₹20,000 / month</span>
+                                    </div>
+
+                                </div>
+
+                                <button class="save-button" aria-label="Save internship">
+                                    ♡
+                                </button>
+
+                            </article>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RIGHT COLUMN -->
+
+                    <div class="right-column">
+
+                        <!-- PROFILE COMPLETION -->
+
+                        <div class="content-panel profile-progress-panel">
+
+                            <div class="panel-heading compact">
+
+                                <div>
+                                    <span class="panel-kicker">YOUR PROFILE</span>
+                                    <h3>Profile strength</h3>
+                                </div>
+
+                                <strong class="profile-percentage">78%</strong>
+
+                            </div>
+
+                            <div class="progress-track">
+                                <div class="progress-fill"></div>
+                            </div>
+
+                            <p>
+                                Add your preferred domains and GitHub profile
+                                to improve your internship matches.
+                            </p>
+
+                            <button class="secondary-button" data-section-target="profile">
+                                Complete profile
+                            </button>
+
+                        </div>
+
+
+                        <!-- DEADLINES -->
+
+                        <div class="content-panel deadline-panel">
+
+                            <div class="panel-heading compact">
+
+                                <div>
+                                    <span class="panel-kicker">COMING UP</span>
+                                    <h3>Application deadlines</h3>
+                                </div>
+
+                                <span class="calendar-icon">□</span>
+
+                            </div>
+
+
+                            <div class="deadline-item">
+
+                                <div class="deadline-date">
+                                    <strong>06</strong>
+                                    <span>OCT</span>
+                                </div>
+
+                                <div class="deadline-info">
+                                    <strong>Backend Intern</strong>
+                                    <span>Atlas Systems</span>
+                                </div>
+
+                                <span class="deadline-days urgent">
+                                    5 days
+                                </span>
+
+                            </div>
+
+
+                            <div class="deadline-item">
+
+                                <div class="deadline-date">
+                                    <strong>10</strong>
+                                    <span>OCT</span>
+                                </div>
+
+                                <div class="deadline-info">
+                                    <strong>Frontend Intern</strong>
+                                    <span>Northstar Labs</span>
+                                </div>
+
+                                <span class="deadline-days">
+                                    9 days
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 DISCOVER SECTION
+            ========================== -->
+
+            <section class="page-section" id="discover">
+
+                <div class="page-heading">
+
+                    <div>
+                        <span class="eyebrow">OPPORTUNITIES</span>
+                        <h2>Discover internships</h2>
+                        <p>
+                            Opportunities matched to your skills and preferences.
+                        </p>
+                    </div>
+
+                    <button class="filter-button" id="filterButton">
+                        ☷ Filters
+                    </button>
+
+                </div>
+
+
+                <div class="search-area">
+
+                    <div class="search-box">
+                        <span>⌕</span>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search role, company or skill..."
+                        >
+                    </div>
+
+                    <select id="locationFilter">
+                        <option value="all">All locations</option>
+                        <option value="remote">Remote</option>
+                        <option value="mumbai">Mumbai</option>
+                        <option value="bengaluru">Bengaluru</option>
+                    </select>
+
+                    <select id="matchFilter">
+                        <option value="all">Any match</option>
+                        <option value="80">80%+ match</option>
+                        <option value="70">70%+ match</option>
+                    </select>
+
+                </div>
+
+
+                <div class="result-summary">
+                    <strong id="resultCount">6 opportunities</strong>
+                    <span>updated today</span>
+                </div>
+
+
+                <div class="discover-grid" id="discoverGrid">
+
+                    <!-- JS will populate internship cards -->
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 SAVED SECTION
+            ========================== -->
+
+            <section class="page-section" id="saved">
+
+                <div class="page-heading">
+
+                    <div>
+                        <span class="eyebrow">BOOKMARKS</span>
+                        <h2>Saved internships</h2>
+                        <p>
+                            Opportunities you've kept for later.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="saved-grid" id="savedGrid">
+                    <!-- JS populated -->
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 APPLICATIONS SECTION
+            ========================== -->
+
+            <section class="page-section" id="applications">
+
+                <div class="page-heading">
+
+                    <div>
+                        <span class="eyebrow">APPLICATION TRACKER</span>
+                        <h2>Your applications</h2>
+                        <p>
+                            Keep track of every opportunity from saved to selected.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="application-stats">
+
+                    <div>
+                        <span>Saved</span>
+                        <strong>3</strong>
+                    </div>
+
+                    <div>
+                        <span>Applied</span>
+                        <strong>7</strong>
+                    </div>
+
+                    <div>
+                        <span>Interview</span>
+                        <strong>2</strong>
+                    </div>
+
+                    <div>
+                        <span>Selected</span>
+                        <strong>1</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="content-panel application-panel">
+
+                    <div class="table-header">
+                        <span>INTERNSHIP</span>
+                        <span>COMPANY</span>
+                        <span>STATUS</span>
+                        <span>DEADLINE</span>
+                    </div>
+
+                    <div class="application-row">
+                        <strong>Frontend Engineering Intern</strong>
+                        <span>Northstar Labs</span>
+                        <span class="status-pill interview">Interview</span>
+                        <span>Oct 10</span>
+                    </div>
+
+                    <div class="application-row">
+                        <strong>Python Developer Intern</strong>
+                        <span>Atlas Systems</span>
+                        <span class="status-pill applied">Applied</span>
+                        <span>Oct 06</span>
+                    </div>
+
+                    <div class="application-row">
+                        <strong>Product Engineering Intern</strong>
+                        <span>Vertex Works</span>
+                        <span class="status-pill saved-status">Saved</span>
+                        <span>Oct 14</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 PROFILE SECTION
+            ========================== -->
+
+            <section class="page-section" id="profile">
+
+                <div class="page-heading">
+
+                    <div>
+                        <span class="eyebrow">ACCOUNT</span>
+                        <h2>My profile</h2>
+                        <p>
+                            Your profile helps the engine find better opportunities.
+                        </p>
+                    </div>
+
+                    <button class="primary-button" id="saveProfileButton">
+                        Save changes
+                    </button>
+
+                </div>
+
+
+                <div class="profile-layout">
+
+                    <div class="content-panel profile-form-panel">
+
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-kicker">PERSONAL DETAILS</span>
+                                <h3>About you</h3>
+                            </div>
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Full name</label>
+                                <input type="text" value="Alex Rao">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" value="alex@example.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Preferred domain</label>
+
+                                <select>
+                                    <option>Web Development</option>
+                                    <option>Software Engineering</option>
+                                    <option>Data Science</option>
+                                    <option>AI / ML</option>
+                                    <option>Cybersecurity</option>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Preferred location</label>
+
+                                <select>
+                                    <option>Remote / India</option>
+                                    <option>Mumbai</option>
+                                    <option>Bengaluru</option>
+                                    <option>Delhi NCR</option>
+                                    <option>Any location</option>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-section">
+
+                            <label>Skills</label>
+
+                            <div class="skill-input">
+                                <span class="skill-tag">Python ×</span>
+                                <span class="skill-tag">JavaScript ×</span>
+                                <span class="skill-tag">HTML ×</span>
+                                <span class="skill-tag">CSS ×</span>
+                                <input
+                                    type="text"
+                                    placeholder="Add a skill..."
+                                    id="skillInput"
+                                >
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Minimum stipend</label>
+                                <input type="number" value="5000">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Preferred duration</label>
+
+                                <select>
+                                    <option>2–6 months</option>
+                                    <option>1–3 months</option>
+                                    <option>3–6 months</option>
+                                    <option>6+ months</option>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="content-panel profile-side-panel">
+
+                        <div class="profile-avatar-large">
+                            AR
+                        </div>
+
+                        <h3>Alex Rao</h3>
+                        <p>Computer Science Student</p>
+
+                        <div class="profile-line"></div>
+
+                        <div class="profile-stat">
+                            <span>Profile strength</span>
+                            <strong>78%</strong>
+                        </div>
+
+                        <div class="profile-stat">
+                            <span>Skills added</span>
+                            <strong>4</strong>
+                        </div>
+
+                        <div class="profile-stat">
+                            <span>Preferences</span>
+                            <strong>6</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =========================
+         INTERNSHIP DETAIL MODAL
+    ========================== -->
+
+    <div class="modal-overlay" id="internshipModal">
+
+        <div class="modal">
+
+            <button class="modal-close" id="modalClose">×</button>
+
+            <div class="modal-company-logo" id="modalLogo">
+                N
+            </div>
+
+            <span class="match-badge modal-match" id="modalMatch">
+                92% match
+            </span>
+
+            <h2 id="modalTitle">
+                Frontend Engineering Intern
+            </h2>
+
+            <p class="modal-company" id="modalCompany">
+                Northstar Labs
+            </p>
+
+            <div class="modal-details">
+
+                <div>
+                    <span>Location</span>
+                    <strong id="modalLocation">Remote</strong>
+                </div>
+
+                <div>
+                    <span>Stipend</span>
+                    <strong id="modalStipend">₹18,000 / month</strong>
+                </div>
+
+                <div>
+                    <span>Duration</span>
+                    <strong id="modalDuration">4 months</strong>
+                </div>
+
+                <div>
+                    <span>Deadline</span>
+                    <strong id="modalDeadline">October 10, 2026</strong>
+                </div>
+
+            </div>
+
+            <div class="modal-section">
+
+                <span class="modal-section-label">REQUIRED SKILLS</span>
+
+                <div class="modal-skills" id="modalSkills">
+                    <span>HTML</span>
+                    <span>CSS</span>
+                    <span>JavaScript</span>
+                    <span>React</span>
+                </div>
+
+            </div>
+
+            <div class="modal-section">
+
+                <span class="modal-section-label">WHY IT MATCHES</span>
+
+                <p id="modalDescription">
+                    This opportunity matches most of your frontend skills.
+                    React is the main additional skill recommended for this role.
+                </p>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button class="secondary-button modal-save">
+                    ♡ Save
+                </button>
+
+                <button class="primary-button">
+                    Apply now ↗
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
