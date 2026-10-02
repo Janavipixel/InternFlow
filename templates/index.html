@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternFlow — Internship Discovery</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ============================= -->
+    <!-- PROFILE SETUP SCREEN -->
+    <!-- ============================= -->
+
+    <section id="profileScreen" class="profile-screen">
+
+        <div class="profile-decoration decoration-one"></div>
+        <div class="profile-decoration decoration-two"></div>
+
+        <div class="profile-card">
+
+            <div class="brand brand-center">
+                <div class="brand-mark">IF</div>
+
+                <div>
+                    <h1>InternFlow</h1>
+                    <span>Smart internship discovery</span>
+                </div>
+            </div>
+
+            <div class="profile-intro">
+                <p class="eyebrow">LET'S GET STARTED</p>
+
+                <h2>Tell us what you're<br>looking for.</h2>
+
+                <p class="profile-description">
+                    InternFlow will use your profile to discover internships
+                    that match your skills, interests and preferences.
+                </p>
+            </div>
+
+            <form id="profileForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="fullName">Your name</label>
+
+                        <input
+                            type="text"
+                            id="fullName"
+                            placeholder="e.g. Rahul Sharma"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="degree">Degree / Course</label>
+
+                        <input
+                            type="text"
+                            id="degree"
+                            placeholder="e.g. B.Tech Computer Science"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="graduation">Graduation year</label>
+
+                        <select id="graduation" required>
+                            <option value="">Select year</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferredRole">Preferred role</label>
+
+                        <select id="preferredRole" required>
+                            <option value="">Choose a role</option>
+                            <option value="Software Development">Software Development</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="UI/UX Design">UI/UX Design</option>
+                            <option value="Cybersecurity">Cybersecurity</option>
+                            <option value="Cloud / DevOps">Cloud / DevOps</option>
+                            <option value="Business / Marketing">Business / Marketing</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="workMode">Preferred work mode</label>
+
+                        <select id="workMode" required>
+                            <option value="">Choose mode</option>
+                            <option value="Remote">Remote</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="On-site">On-site</option>
+                            <option value="Any">Any</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="skills">Your skills</label>
+
+                        <input
+                            type="text"
+                            id="skills"
+                            placeholder="Python, JavaScript, SQL, React"
+                            required
+                        >
+
+                        <span class="input-hint">
+                            Separate skills using commas.
+                        </span>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="primary-button profile-button">
+                    Build my internship feed
+                    <span>→</span>
+                </button>
+
+            </form>
+
+            <p class="privacy-note">
+                Your profile stays in this browser for now.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- MAIN APPLICATION -->
+    <!-- ============================= -->
+
+    <div id="app" class="app hidden">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-top">
+
+                <div class="brand">
+                    <div class="brand-mark">IF</div>
+
+                    <div>
+                        <h1>InternFlow</h1>
+                        <span>Discovery workspace</span>
+                    </div>
+                </div>
+
+                <nav class="navigation">
+
+                    <p class="nav-label">WORKSPACE</p>
+
+                    <button class="nav-item active" data-page="overview">
+                        <span class="nav-icon">⌂</span>
+                        Overview
+                    </button>
+
+                    <button class="nav-item" data-page="discover">
+                        <span class="nav-icon">⌕</span>
+                        Discover
+                    </button>
+
+                    <button class="nav-item" data-page="saved">
+                        <span class="nav-icon">♡</span>
+                        Saved
+                        <span id="savedCount" class="nav-count">0</span>
+                    </button>
+
+                    <button class="nav-item" data-page="applications">
+                        <span class="nav-icon">✓</span>
+                        Applications
+                    </button>
+
+                    <p class="nav-label second-label">ACCOUNT</p>
+
+                    <button class="nav-item" data-page="profile">
+                        <span class="nav-icon">◎</span>
+                        My profile
+                    </button>
+
+                </nav>
+
+            </div>
+
+            <div class="sidebar-bottom">
+
+                <div class="automation-card">
+
+                    <div class="automation-header">
+                        <span class="status-dot"></span>
+                        Automation active
+                    </div>
+
+                    <p>
+                        InternFlow is ready to monitor new internship opportunities.
+                    </p>
+
+                    <span class="automation-time">
+                        Last scan · Just now
+                    </span>
+
+                </div>
+
+                <div class="sidebar-user">
+
+                    <div id="sidebarAvatar" class="avatar">
+                        U
+                    </div>
+
+                    <div>
+                        <strong id="sidebarUserName">User</strong>
+                        <span id="sidebarUserRole">Student</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main-content">
+
+            <!-- TOP BAR -->
+
+            <header class="topbar">
+
+                <div class="mobile-brand">
+                    <div class="brand-mark">IF</div>
+                    <strong>InternFlow</strong>
+                </div>
+
+                <div class="topbar-search">
+                    <span>⌕</span>
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search internships, companies or skills..."
+                    >
+                </div>
+
+                <div class="topbar-actions">
+
+                    <button class="icon-button" id="notificationButton" title="Notifications">
+                        ♢
+                    </button>
+
+                    <div class="topbar-profile">
+                        <div id="topbarAvatar" class="avatar small-avatar">U</div>
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ============================= -->
+            <!-- OVERVIEW PAGE -->
+            <!-- ============================= -->
+
+            <section id="overviewPage" class="page active-page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">YOUR INTERNSHIP WORKSPACE</p>
+
+                        <h2 id="welcomeHeading">
+                            Good morning.
+                        </h2>
+
+                        <p>
+                            Here is what InternFlow found for you today.
+                        </p>
+                    </div>
+
+                    <button class="secondary-button" id="refreshButton">
+                        ↻ Refresh opportunities
+                    </button>
+
+                </div>
+
+
+                <!-- STATS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Relevant matches</span>
+                            <span class="stat-icon">✦</span>
+                        </div>
+
+                        <strong id="matchStat">0</strong>
+
+                        <p>
+                            Opportunities matching your profile
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Saved</span>
+                            <span class="stat-icon">♡</span>
+                        </div>
+
+                        <strong id="savedStat">0</strong>
+
+                        <p>
+                            Opportunities you've shortlisted
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <div class="stat-top">
+                            <span>Applications</span>
+                            <span class="stat-icon">✓</span>
+                        </div>
+
+                        <strong id="applicationStat">0</strong>
+
+                        <p>
+                            Applications you're tracking
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card accent-stat">
+
+                        <div class="stat-top">
+                            <span>Closing soon</span>
+                            <span class="stat-icon">!</span>
+                        </div>
+
+                        <strong id="deadlineStat">0</strong>
+
+                        <p>
+                            Deadlines within the next 7 days
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MAIN DASHBOARD GRID -->
+
+                <div class="dashboard-grid">
+
+                    <div class="dashboard-main">
+
+                        <div class="section-heading">
+
+                            <div>
+                                <p class="eyebrow">MATCHED FOR YOU</p>
+                                <h3>Latest opportunities</h3>
+                            </div>
+
+                            <button class="text-button" data-page-link="discover">
+                                View all →
+                            </button>
+
+                        </div>
+
+                        <div id="featuredInternships" class="internship-list">
+                            <!-- JS inserts cards here -->
+                        </div>
+
+                    </div>
+
+
+                    <aside class="dashboard-side">
+
+                        <div class="side-panel">
+
+                            <div class="section-heading compact">
+
+                                <div>
+                                    <p class="eyebrow">DEADLINE WATCH</p>
+                                    <h3>Coming up</h3>
+                                </div>
+
+                            </div>
+
+                            <div id="deadlineList" class="deadline-list">
+                                <!-- JS inserts deadlines -->
+                            </div>
+
+                        </div>
+
+
+                        <div class="side-panel journey-panel">
+
+                            <p class="eyebrow">HOW IT WORKS</p>
+
+                            <h3>Your automated journey</h3>
+
+                            <div class="journey">
+
+                                <div class="journey-step">
+                                    <span>01</span>
+                                    <div>
+                                        <strong>Profile</strong>
+                                        <p>You tell us what you want.</p>
+                                    </div>
+                                </div>
+
+                                <div class="journey-line"></div>
+
+                                <div class="journey-step">
+                                    <span>02</span>
+                                    <div>
+                                        <strong>Discovery</strong>
+                                        <p>Internships are collected automatically.</p>
+                                    </div>
+                                </div>
+
+                                <div class="journey-line"></div>
+
+                                <div class="journey-step">
+                                    <span>03</span>
+                                    <div>
+                                        <strong>Matching</strong>
+                                        <p>Gemini analyses relevance.</p>
+                                    </div>
+                                </div>
+
+                                <div class="journey-line"></div>
+
+                                <div class="journey-step">
+                                    <span>04</span>
+                                    <div>
+                                        <strong>Reminder</strong>
+                                        <p>Never miss an important deadline.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+
+            <!-- ============================= -->
+            <!-- DISCOVER PAGE -->
+            <!-- ============================= -->
+
+            <section id="discoverPage" class="page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">DISCOVERY</p>
+
+                        <h2>Find your next opportunity.</h2>
+
+                        <p>
+                            Browse internships matched against your profile.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="filter-bar">
+
+                    <div class="filter-search">
+
+                        <span>⌕</span>
+
+                        <input
+                            type="text"
+                            id="internshipSearch"
+                            placeholder="Search by role, company or skill"
+                        >
+
+                    </div>
+
+                    <select id="modeFilter">
+                        <option value="All">All work modes</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="On-site">On-site</option>
+                    </select>
+
+                    <select id="sortFilter">
+                        <option value="match">Best match</option>
+                        <option value="deadline">Deadline</option>
+                        <option value="stipend">Stipend</option>
+                    </select>
+
+                </div>
+
+                <div id="discoverList" class="internship-list discover-list">
+                    <!-- JS inserts cards -->
+                </div>
+
+            </section>
+
+
+            <!-- ============================= -->
+            <!-- SAVED PAGE -->
+            <!-- ============================= -->
+
+            <section id="savedPage" class="page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">SHORTLIST</p>
+
+                        <h2>Your saved internships.</h2>
+
+                        <p>
+                            Keep promising opportunities in one place.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="savedList" class="internship-list">
+                    <!-- JS inserts saved cards -->
+                </div>
+
+            </section>
+
+
+            <!-- ============================= -->
+            <!-- APPLICATIONS PAGE -->
+            <!-- ============================= -->
+
+            <section id="applicationsPage" class="page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">APPLICATION TRACKER</p>
+
+                        <h2>Track your applications.</h2>
+
+                        <p>
+                            Keep an eye on every opportunity you've applied to.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="application-summary">
+
+                    <div>
+                        <span>Applied</span>
+                        <strong id="appliedCount">0</strong>
+                    </div>
+
+                    <div>
+                        <span>In progress</span>
+                        <strong id="progressCount">0</strong>
+                    </div>
+
+                    <div>
+                        <span>Completed</span>
+                        <strong id="completedCount">0</strong>
+                    </div>
+
+                </div>
+
+                <div id="applicationsList" class="applications-list">
+                    <!-- JS inserts applications -->
+                </div>
+
+            </section>
+
+
+            <!-- ============================= -->
+            <!-- PROFILE PAGE -->
+            <!-- ============================= -->
+
+            <section id="profilePage" class="page">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">YOUR PROFILE</p>
+
+                        <h2>Keep your preferences up to date.</h2>
+
+                        <p>
+                            Your profile powers the matching engine.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="profile-dashboard-card">
+
+                    <div class="profile-summary">
+
+                        <div id="profileAvatar" class="profile-large-avatar">
+                            U
+                        </div>
+
+                        <div>
+                            <h3 id="profileName">User</h3>
+                            <p id="profileDegree">Student</p>
+                        </div>
+
+                    </div>
+
+                    <form id="editProfileForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="editName">Name</label>
+                                <input type="text" id="editName">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editDegree">Degree</label>
+                                <input type="text" id="editDegree">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editGraduation">Graduation year</label>
+                                <select id="editGraduation">
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editRole">Preferred role</label>
+                                <select id="editRole">
+                                    <option value="Software Development">Software Development</option>
+                                    <option value="Data Science">Data Science</option>
+                                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                                    <option value="Web Development">Web Development</option>
+                                    <option value="UI/UX Design">UI/UX Design</option>
+                                    <option value="Cybersecurity">Cybersecurity</option>
+                                    <option value="Cloud / DevOps">Cloud / DevOps</option>
+                                    <option value="Business / Marketing">Business / Marketing</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editMode">Work mode</label>
+                                <select id="editMode">
+                                    <option value="Remote">Remote</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                    <option value="On-site">On-site</option>
+                                    <option value="Any">Any</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="editSkills">Skills</label>
+                                <input type="text" id="editSkills">
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="primary-button">
+                            Save profile changes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- INTERNSHIP DETAILS MODAL -->
+    <!-- ============================= -->
+
+    <div id="internshipModal" class="modal hidden">
+
+        <div class="modal-overlay"></div>
+
+        <div class="modal-card">
+
+            <button id="closeModal" class="modal-close">×</button>
+
+            <div id="modalContent">
+                <!-- JS inserts content -->
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- TOAST -->
+    <!-- ============================= -->
+
+    <div id="toast" class="toast">
+        <span id="toastMessage">Done</span>
+    </div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+   
+</body>
+</html>
