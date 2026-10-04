@@ -24,6 +24,19 @@ USE_MOCK_GEMINI = False
 
 
 # ========================================
+# GEMINI API LIMIT
+# ========================================
+# Ek search ke andar maximum 5 Gemini
+# requests hi bheje jayenge.
+#
+# Tavily 10 results la sakta hai,
+# lekin Gemini sirf useful results par
+# maximum 5 baar call hoga.
+
+MAX_GEMINI_RESULTS = 5
+
+
+# ========================================
 # UNWANTED PAGE FILTER
 # ========================================
 
@@ -221,6 +234,18 @@ def search_and_process_internships(
 
 
     # --------------------------------
+    # Gemini request counter
+    # --------------------------------
+    # Sirf useful/relevant results ko
+    # Gemini bheja jayega.
+    #
+    # Maximum 5 Gemini requests per
+    # search.
+
+    gemini_results_processed = 0
+
+
+    # --------------------------------
     # Process results
     # --------------------------------
 
@@ -280,6 +305,43 @@ def search_and_process_internships(
             )
 
             continue
+
+
+        # ========================================
+        # LIMIT GEMINI API CALLS
+        # ========================================
+
+        if (
+            not USE_MOCK_GEMINI
+            and gemini_results_processed
+            >= MAX_GEMINI_RESULTS
+        ):
+
+            print(
+                "Gemini result limit reached."
+            )
+
+            print(
+                f"Maximum "
+                f"{MAX_GEMINI_RESULTS} "
+                f"Gemini requests allowed."
+            )
+
+            break
+
+
+        # Count only results that actually
+        # passed the filters above.
+
+        if not USE_MOCK_GEMINI:
+
+            gemini_results_processed += 1
+
+            print(
+                f"Gemini request "
+                f"{gemini_results_processed}/"
+                f"{MAX_GEMINI_RESULTS}"
+            )
 
 
         # ========================================
@@ -444,14 +506,10 @@ WEB PAGE CONTENT:
                 )
 
                 # --------------------------------
-                # Gemini free-tier rate limit
+                # Wait between Gemini requests
                 # --------------------------------
-                # Current Gemini limit is around
-                # 5 requests per minute.
-                #
-                # Wait before sending the next
-                # Gemini request.
-                # --------------------------------
+                # This reduces the chance of hitting
+                # short-term rate limits.
 
                 time.sleep(13)
 
@@ -460,6 +518,40 @@ WEB PAGE CONTENT:
                 print(
                     f"Gemini failed for {url}: {e}"
                 )
+
+                error_text = str(e).upper()
+
+
+                # --------------------------------
+                # Gemini quota / rate-limit error
+                # --------------------------------
+                # Agar quota/rate limit aa gaya,
+                # remaining Gemini requests ko
+                # immediately stop kar do.
+
+                if (
+                    "RESOURCE_EXHAUSTED" in error_text
+                    or "429" in error_text
+                    or "QUOTA" in error_text
+                    or "RATE LIMIT" in error_text
+                ):
+
+                    print(
+                        "Gemini quota/rate limit reached."
+                    )
+
+                    print(
+                        "Stopping further Gemini requests."
+                    )
+
+                    break
+
+
+                # --------------------------------
+                # Other Gemini error
+                # --------------------------------
+                # Ek result fail hua to baaki
+                # results ko try kar sakte hain.
 
                 continue
 
