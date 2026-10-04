@@ -498,6 +498,28 @@ WEB PAGE CONTENT:
                     prompt
                 )
 
+                # ========================================
+                # IMPORTANT:
+                # If Gemini quota is exhausted,
+                # ask_gemini() returns None.
+                #
+                # Stop immediately instead of sleeping
+                # and making another request.
+                # ========================================
+
+                if internship is None:
+
+                    print(
+                        "Gemini unavailable."
+                    )
+
+                    print(
+                        "Stopping further Gemini requests."
+                    )
+
+                    break
+
+
                 # Wait before the next Gemini request
                 time.sleep(13)
 
@@ -1009,3 +1031,4 @@ if __name__ == "__main__":
                 f"Missing Skills: "
                 f"{internship['missing_skills']}"
             )
+
