@@ -1,14 +1,15 @@
 import os
 import json
+import time
 from datetime import datetime
-from verify_application import verify_application_url
+
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
-from gemini_client import ask_gemini
-from matching import calculate_match
-from stipend import extract_stipend_amount
-
+from AI.verify_application import verify_application_url
+from AI.gemini_client import ask_gemini
+from AI.matching import calculate_match
+from AI.stipend import extract_stipend_amount
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ load_dotenv()
 # True  = Gemini ke bina test karega
 # False = Actual Gemini API use karega
 
-USE_MOCK_GEMINI = True
+USE_MOCK_GEMINI = False
 
 
 # ========================================
@@ -107,6 +108,52 @@ def looks_like_internship_page(url, title, content):
 
 
 # ========================================
+# REMOVE DUPLICATES
+# ========================================
+
+def remove_duplicate_internships(internships):
+
+    unique_internships = []
+    seen = set()
+
+    for internship in internships:
+
+        company = str(
+            internship.get("company", "")
+        ).lower().strip()
+
+        role = str(
+            internship.get("role", "")
+        ).lower().strip()
+
+        location = str(
+            internship.get("location", "")
+        ).lower().strip()
+
+        key = (
+            company,
+            role,
+            location
+        )
+
+        if key in seen:
+
+            print(
+                "Skipped: duplicate internship"
+            )
+
+            continue
+
+        seen.add(key)
+
+        unique_internships.append(
+            internship
+        )
+
+    return unique_internships
+
+
+# ========================================
 # MAIN PIPELINE
 # ========================================
 
@@ -121,11 +168,15 @@ def search_and_process_internships(
     # Tavily setup
     # --------------------------------
 
-    tavily_key = os.getenv("TAVILY_API_KEY")
+    tavily_key = os.getenv(
+        "TAVILY_API_KEY"
+    )
 
     if not tavily_key:
 
-        print("TAVILY_API_KEY not found.")
+        print(
+            "TAVILY_API_KEY not found."
+        )
 
         return []
 
@@ -141,8 +192,13 @@ def search_and_process_internships(
         f"OR applications open"
     )
 
-    print("Searching for internships...")
-    print(f"Query: {query}")
+    print(
+        "Searching for internships..."
+    )
+
+    print(
+        f"Query: {query}"
+    )
 
 
     # --------------------------------
@@ -354,7 +410,7 @@ WEB PAGE CONTENT:
                 ],
 
                 "location":
-                    "Mumbai",
+                    location,
 
                 "stipend":
                     "₹15000/month",
@@ -369,7 +425,7 @@ WEB PAGE CONTENT:
                     "Students with basic cybersecurity knowledge",
 
                 "application_url":
-                   url,
+                    url,
 
                 "posted_date":
                     "",
@@ -386,6 +442,18 @@ WEB PAGE CONTENT:
                 internship = ask_gemini(
                     prompt
                 )
+
+                # --------------------------------
+                # Gemini free-tier rate limit
+                # --------------------------------
+                # Current Gemini limit is around
+                # 5 requests per minute.
+                #
+                # Wait before sending the next
+                # Gemini request.
+                # --------------------------------
+
+                time.sleep(13)
 
             except Exception as e:
 
@@ -541,7 +609,6 @@ WEB PAGE CONTENT:
 
         deadline = internship["deadline"]
 
-
         if deadline:
 
             try:
@@ -553,7 +620,6 @@ WEB PAGE CONTENT:
 
                 today = datetime.now().date()
 
-
                 if deadline_date < today:
 
                     print(
@@ -561,7 +627,6 @@ WEB PAGE CONTENT:
                     )
 
                     continue
-
 
             except ValueError:
 
@@ -578,7 +643,6 @@ WEB PAGE CONTENT:
         stipend_amount = extract_stipend_amount(
             internship["stipend"]
         )
-
 
         if (
             stipend_amount is not None
@@ -598,26 +662,45 @@ WEB PAGE CONTENT:
 
         internship_location = str(
             internship["location"]
-        ).lower()
+        ).lower().strip()
 
-        requested_location = location.lower()
-
-
-        allowed_location = (
-
-            requested_location
-            in internship_location
-
-            or "remote"
-            in internship_location
-
-            or "india"
-            in internship_location
-
-            or "pan india"
-            in internship_location
-
+        requested_location = (
+            location.lower().strip()
         )
+
+
+        # Anywhere in India:
+        # accept internships from any Indian location
+
+        if requested_location == "anywhere in india":
+
+            allowed_location = True
+
+
+        # Remote:
+        # accept only clearly remote internships
+
+        elif requested_location == "remote":
+
+            allowed_location = (
+                "remote" in internship_location
+                or "work from home" in internship_location
+                or "wfh" in internship_location
+            )
+
+
+        # Normal location:
+        # accept matching city/location,
+        # remote, pan-india, or India-wide internships
+
+        else:
+
+            allowed_location = (
+                requested_location in internship_location
+                or "remote" in internship_location
+                or "pan india" in internship_location
+                or "india" in internship_location
+            )
 
 
         if not allowed_location:
@@ -627,7 +710,6 @@ WEB PAGE CONTENT:
             )
 
             continue
-
 
 
         # ========================================
@@ -669,6 +751,7 @@ WEB PAGE CONTENT:
             "Application URL verified."
         )
 
+
         # ========================================
         # STEP 14: Skill matching
         # ========================================
@@ -676,7 +759,6 @@ WEB PAGE CONTENT:
         internship_skills = internship[
             "skills"
         ]
-
 
         if not isinstance(
             internship_skills,
@@ -706,21 +788,17 @@ WEB PAGE CONTENT:
             "stipend_amount"
         ] = stipend_amount
 
-
         internship[
             "matched_skills"
         ] = matched_skills
-
 
         internship[
             "missing_skills"
         ] = missing_skills
 
-
         internship[
             "match_percentage"
         ] = match_percentage
-
 
         internship[
             "source_url"
@@ -735,7 +813,6 @@ WEB PAGE CONTENT:
             internship
         )
 
-
         print(
             f"Added: "
             f"{internship['company']} - "
@@ -744,18 +821,20 @@ WEB PAGE CONTENT:
 
 
     # ========================================
-    # STEP 17: Sort by match percentage
+    # STEP 17: Remove duplicates
+    # ========================================
+
+    internships = remove_duplicate_internships(
+        internships
+    )
+
+
+    # ========================================
+    # STEP 18: Sort by match percentage
     # ========================================
 
     internships.sort(
-
-        key=lambda x:
-            (
-                x["match_percentage"]
-                if x["match_percentage"] is not None
-                else -1
-            ),
-
+        key=lambda x: x.get("match_percentage") or 0,
         reverse=True
     )
 

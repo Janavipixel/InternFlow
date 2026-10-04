@@ -27,10 +27,9 @@ def ask_gemini(prompt):
         except Exception as e:
             error_message = str(e)
 
-            if "503" in error_message:
-                print(f"{model} temporarily unavailable. Trying backup...")
+            if "503" in error_message or "429" in error_message:
+                print(f"{model} unavailable/quota exceeded. Trying backup...")
                 continue
-
             raise e
 
     return None
