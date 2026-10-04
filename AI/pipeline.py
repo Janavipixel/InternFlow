@@ -26,12 +26,6 @@ USE_MOCK_GEMINI = False
 # ========================================
 # GEMINI API LIMIT
 # ========================================
-# Ek search ke andar maximum 5 Gemini
-# requests hi bheje jayenge.
-#
-# Tavily 10 results la sakta hai,
-# lekin Gemini sirf useful results par
-# maximum 5 baar call hoga.
 
 MAX_GEMINI_RESULTS = 5
 
@@ -217,12 +211,17 @@ def search_and_process_internships(
     # --------------------------------
     # Tavily search
     # --------------------------------
+    # Reduced memory usage for Render.
+    #
+    # basic search
+    # only 5 results
+    # no raw webpage content
 
     response = tavily.search(
         query=query,
-        search_depth="advanced",
-        max_results=10,
-        include_raw_content=True
+        search_depth="basic",
+        max_results=5,
+        include_raw_content=False
     )
 
     results = response.get(
@@ -236,11 +235,6 @@ def search_and_process_internships(
     # --------------------------------
     # Gemini request counter
     # --------------------------------
-    # Sirf useful/relevant results ko
-    # Gemini bheja jayega.
-    #
-    # Maximum 5 Gemini requests per
-    # search.
 
     gemini_results_processed = 0
 
@@ -261,9 +255,11 @@ def search_and_process_internships(
             ""
         )
 
+        # raw_content intentionally disabled
+        # to reduce Render memory usage.
+
         content = (
-            result.get("raw_content")
-            or result.get("content")
+            result.get("content")
             or ""
         )
 
@@ -329,9 +325,6 @@ def search_and_process_internships(
 
             break
 
-
-        # Count only results that actually
-        # passed the filters above.
 
         if not USE_MOCK_GEMINI:
 
@@ -505,12 +498,7 @@ WEB PAGE CONTENT:
                     prompt
                 )
 
-                # --------------------------------
-                # Wait between Gemini requests
-                # --------------------------------
-                # This reduces the chance of hitting
-                # short-term rate limits.
-
+                # Wait before the next Gemini request
                 time.sleep(13)
 
             except Exception as e:
@@ -525,9 +513,6 @@ WEB PAGE CONTENT:
                 # --------------------------------
                 # Gemini quota / rate-limit error
                 # --------------------------------
-                # Agar quota/rate limit aa gaya,
-                # remaining Gemini requests ko
-                # immediately stop kar do.
 
                 if (
                     "RESOURCE_EXHAUSTED" in error_text
@@ -547,12 +532,7 @@ WEB PAGE CONTENT:
                     break
 
 
-                # --------------------------------
                 # Other Gemini error
-                # --------------------------------
-                # Ek result fail hua to baaki
-                # results ko try kar sakte hain.
-
                 continue
 
 
@@ -761,16 +741,14 @@ WEB PAGE CONTENT:
         )
 
 
-        # Anywhere in India:
-        # accept internships from any Indian location
+        # Anywhere in India
 
         if requested_location == "anywhere in india":
 
             allowed_location = True
 
 
-        # Remote:
-        # accept only clearly remote internships
+        # Remote
 
         elif requested_location == "remote":
 
@@ -781,9 +759,7 @@ WEB PAGE CONTENT:
             )
 
 
-        # Normal location:
-        # accept matching city/location,
-        # remote, pan-india, or India-wide internships
+        # Normal location
 
         else:
 
