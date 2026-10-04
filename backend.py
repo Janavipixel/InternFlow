@@ -4,10 +4,29 @@ import sqlite3
 from datetime import date, datetime
 
 from AI.pipeline import search_and_process_internships
+from database import create_database
 
 
 app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(app)
+
+
+# =========================================
+# DATABASE
+# =========================================
+
+DATABASE = "internflow.db"
+
+
+# =========================================
+# CREATE DATABASE TABLES
+# =========================================
+# This is important for Render.
+# Render starts with a fresh environment, so
+# the required SQLite tables must be created
+# when the application starts.
+
+create_database()
 
 
 # =========================================
@@ -17,13 +36,6 @@ CORS(app)
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
-
-
-# =========================================
-# DATABASE
-# =========================================
-
-DATABASE = "internflow.db"
 
 
 # =========================================
