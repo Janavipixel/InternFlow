@@ -17,7 +17,7 @@ load_dotenv()
 # ========================================
 # TEMPORARY TEST MODE
 # ========================================
-# True  = Gemini ke bina test karega
+# True  = Gemini ke bina mock data test karega
 # False = Actual Gemini API use karega
 
 USE_MOCK_GEMINI = False
@@ -158,6 +158,149 @@ def remove_duplicate_internships(internships):
         )
 
     return unique_internships
+
+
+# ========================================
+# TAVILY FALLBACK
+# ========================================
+# Used only when Gemini is unavailable.
+#
+# IMPORTANT:
+# We do NOT invent stipend, deadline,
+# duration, eligibility, etc.
+# Those fields remain empty.
+
+
+def create_tavily_fallback(
+    title,
+    url,
+    content,
+    location,
+    student_skills
+):
+
+    title_lower = title.lower()
+    content_lower = content.lower()
+
+    # --------------------------------
+    # Try to determine company
+    # --------------------------------
+
+    company = ""
+
+    if " — " in title:
+
+        company = title.split(
+            " — ",
+            1
+        )[0].strip()
+
+    elif " - " in title:
+
+        company = title.split(
+            " - ",
+            1
+        )[0].strip()
+
+    elif " | " in title:
+
+        company = title.split(
+            " | ",
+            1
+        )[0].strip()
+
+    if not company:
+
+        company = "Company from search result"
+
+
+    # --------------------------------
+    # Try to determine role
+    # --------------------------------
+
+    role = "Internship"
+
+    if "cybersecurity" in title_lower:
+
+        role = "Cybersecurity Intern"
+
+    elif "software" in title_lower:
+
+        role = "Software Intern"
+
+    elif "python" in title_lower:
+
+        role = "Python Intern"
+
+    elif "data" in title_lower:
+
+        role = "Data Intern"
+
+    elif "web" in title_lower:
+
+        role = "Web Development Intern"
+
+
+    # --------------------------------
+    # Find skills visible in result
+    # --------------------------------
+
+    matched_possible_skills = []
+
+    combined_text = (
+        title_lower
+        + " "
+        + content_lower
+    )
+
+    for skill in student_skills:
+
+        if skill.lower() in combined_text:
+
+            matched_possible_skills.append(
+                skill
+            )
+
+
+    # --------------------------------
+    # Return basic internship object
+    # --------------------------------
+
+    return {
+
+        "company":
+            company,
+
+        "role":
+            role,
+
+        "skills":
+            matched_possible_skills,
+
+        "location":
+            location,
+
+        "stipend":
+            "",
+
+        "duration":
+            "",
+
+        "deadline":
+            "",
+
+        "eligibility":
+            "",
+
+        "application_url":
+            url,
+
+        "posted_date":
+            "",
+
+        "application_status":
+            "unknown"
+    }
 
 
 # ========================================
@@ -498,13 +641,16 @@ WEB PAGE CONTENT:
                     prompt
                 )
 
+
                 # ========================================
-                # IMPORTANT:
-                # If Gemini quota is exhausted,
-                # ask_gemini() returns None.
+                # GEMINI UNAVAILABLE FALLBACK
+                # ========================================
                 #
-                # Stop immediately instead of sleeping
-                # and making another request.
+                # If Gemini quota is exhausted,
+                # create a basic REAL internship object
+                # using Tavily's result.
+                #
+                # We do NOT make another Gemini request.
                 # ========================================
 
                 if internship is None:
@@ -514,14 +660,23 @@ WEB PAGE CONTENT:
                     )
 
                     print(
-                        "Stopping further Gemini requests."
+                        "Using Tavily fallback instead."
                     )
 
-                    break
+                    internship = create_tavily_fallback(
+                        title,
+                        url,
+                        content,
+                        location,
+                        student_skills
+                    )
 
+                else:
 
-                # Wait before the next Gemini request
-                time.sleep(13)
+                    # Wait only when an actual Gemini
+                    # request succeeded.
+                    time.sleep(13)
+
 
             except Exception as e:
 
@@ -548,14 +703,36 @@ WEB PAGE CONTENT:
                     )
 
                     print(
-                        "Stopping further Gemini requests."
+                        "Using Tavily fallback instead."
                     )
 
-                    break
+                    internship = create_tavily_fallback(
+                        title,
+                        url,
+                        content,
+                        location,
+                        student_skills
+                    )
 
 
-                # Other Gemini error
-                continue
+                else:
+
+                    # For another Gemini error,
+                    # also use Tavily fallback instead
+                    # of losing the search result.
+
+                    print(
+                        "Using Tavily fallback "
+                        "because Gemini failed."
+                    )
+
+                    internship = create_tavily_fallback(
+                        title,
+                        url,
+                        content,
+                        location,
+                        student_skills
+                    )
 
 
         # ========================================
@@ -1031,4 +1208,3 @@ if __name__ == "__main__":
                 f"Missing Skills: "
                 f"{internship['missing_skills']}"
             )
-
