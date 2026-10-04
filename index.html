@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>InternFlow</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ================= LOGIN ================= -->
+
+    <section id="loginPage" class="page active">
+
+        <div class="login-page">
+
+            <div class="login-visual">
+
+                <div class="visual-top">
+                    <div class="logo">IF</div>
+                    <span>InternFlow</span>
+                </div>
+
+                <div class="visual-content">
+
+                    <span class="mini-label">
+                        YOUR INTERNSHIP HUNT, AUTOMATED
+                    </span>
+
+                    <h1>
+                        Stop searching.<br>
+                        Let internships<br>
+                        <span>find you.</span>
+                    </h1>
+
+                    <p>
+                        Tell us what you want once. InternFlow searches,
+                        matches and sends relevant internships straight
+                        to your inbox.
+                    </p>
+
+                    <div class="visual-points">
+
+                        <div>
+                            <span class="point-icon">01</span>
+                            <p>Set your preferences</p>
+                        </div>
+
+                        <div>
+                            <span class="point-icon">02</span>
+                            <p>We find relevant internships</p>
+                        </div>
+
+                        <div>
+                            <span class="point-icon">03</span>
+                            <p>Get a personalized email brief</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="visual-footer">
+                    <span>
+                        Built for students who have better things to do.
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="login-form-area">
+
+                <div class="mobile-brand">
+                    <div class="logo">IF</div>
+                    <strong>InternFlow</strong>
+                </div>
+
+                <div class="login-form-wrapper">
+
+                    <span class="form-label">
+                        WELCOME TO INTERNFLOW
+                    </span>
+
+                    <h2>Let's get started.</h2>
+
+                    <p class="form-description">
+                        Create your profile and we'll take care of
+                        the internship searching part.
+                    </p>
+
+                    <form id="loginForm">
+
+                        <div class="input-group">
+
+                            <label for="loginName">
+                                Full name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="loginName"
+                                placeholder="e.g. Janavi Punmiya"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="loginEmail">
+                                Email address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="loginEmail"
+                                placeholder="you@example.com"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="loginPassword">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="loginPassword"
+                                placeholder="Create a password"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+                            Continue
+                            <span>→</span>
+                        </button>
+
+                    </form>
+
+                    <p class="privacy-note">
+                        Your email is only used to deliver your
+                        internship briefs.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= PREFERENCES ================= -->
+
+    <section id="preferencesPage" class="page">
+
+        <div class="app-shell">
+
+            <header class="topbar">
+
+                <div class="brand">
+                    <div class="logo">IF</div>
+                    <strong>InternFlow</strong>
+                </div>
+
+                <button
+                    id="logoutBtn"
+                    class="logout-btn"
+                >
+                    Log out
+                </button>
+
+            </header>
+
+
+            <main class="preferences-main">
+
+                <div class="setup-intro">
+
+                    <div>
+
+                        <span class="form-label">
+                            STEP 01 / YOUR PROFILE
+                        </span>
+
+                        <h1>What are you looking for?</h1>
+
+                        <p>
+                            The more you tell us, the better we can filter
+                            internships before they reach your inbox.
+                        </p>
+
+                    </div>
+
+                    <div class="setup-number">
+                        01
+                    </div>
+
+                </div>
+
+
+                <form id="preferencesForm">
+
+                    <!-- BASIC PREFERENCES -->
+
+                    <section class="preference-section">
+
+                        <div class="section-number">
+                            01
+                        </div>
+
+                        <div class="section-content">
+
+                            <div class="section-heading">
+
+                                <h2>
+                                    About your internship
+                                </h2>
+
+                                <p>
+                                    Tell us what kind of opportunity
+                                    you want.
+                                </p>
+
+                            </div>
+
+
+                            <div class="preference-grid">
+
+                                <div class="field full">
+
+                                    <label>
+                                        Skills
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="skills"
+                                        placeholder="Python, Java, Linux, React, SQL..."
+                                        required
+                                    >
+
+                                    <small>
+                                        Add all skills you want
+                                        internships to match against.
+                                    </small>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Preferred domain
+                                    </label>
+
+                                    <select
+                                        id="domain"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Choose a domain
+                                        </option>
+
+                                        <option>
+                                            Cybersecurity
+                                        </option>
+
+                                        <option>
+                                            Software Development
+                                        </option>
+
+                                        <option>
+                                            Web Development
+                                        </option>
+
+                                        <option>
+                                            App Development
+                                        </option>
+
+                                        <option>
+                                            Data Science
+                                        </option>
+
+                                        <option>
+                                            Artificial Intelligence
+                                        </option>
+
+                                        <option>
+                                            Machine Learning
+                                        </option>
+
+                                        <option>
+                                            Cloud Computing
+                                        </option>
+
+                                        <option>
+                                            DevOps
+                                        </option>
+
+                                        <option>
+                                            Cloud Security
+                                        </option>
+
+                                        <option>
+                                            IoT
+                                        </option>
+
+                                        <option>
+                                            Embedded Systems
+                                        </option>
+
+                                        <option>
+                                            Networking
+                                        </option>
+
+                                        <option>
+                                            Blockchain
+                                        </option>
+
+                                        <option>
+                                            UI/UX Design
+                                        </option>
+
+                                        <option>
+                                            Product Management
+                                        </option>
+
+                                        <option>
+                                            Digital Marketing
+                                        </option>
+
+                                        <option>
+                                            Finance
+                                        </option>
+
+                                        <option>
+                                            Business Analytics
+                                        </option>
+
+                                        <option>
+                                            Other
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Internship type
+                                    </label>
+
+                                    <select id="internshipType">
+
+                                        <option value="Any">
+                                            Any type
+                                        </option>
+
+                                        <option>
+                                            Technical
+                                        </option>
+
+                                        <option>
+                                            Non-Technical
+                                        </option>
+
+                                        <option>
+                                            Research
+                                        </option>
+
+                                        <option>
+                                            Engineering
+                                        </option>
+
+                                        <option>
+                                            Product
+                                        </option>
+
+                                        <option>
+                                            Design
+                                        </option>
+
+                                        <option>
+                                            Business
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- LOCATION -->
+
+                    <section class="preference-section">
+
+                        <div class="section-number">
+                            02
+                        </div>
+
+                        <div class="section-content">
+
+                            <div class="section-heading">
+
+                                <h2>
+                                    Where do you want to work?
+                                </h2>
+
+                                <p>
+                                    You can select multiple locations.
+                                </p>
+
+                            </div>
+
+
+                            <div class="location-grid">
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Mumbai"
+                                    >
+                                    <span>Mumbai</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Pune"
+                                    >
+                                    <span>Pune</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Bengaluru"
+                                    >
+                                    <span>Bengaluru</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Hyderabad"
+                                    >
+                                    <span>Hyderabad</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Delhi NCR"
+                                    >
+                                    <span>Delhi NCR</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Chennai"
+                                    >
+                                    <span>Chennai</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Kolkata"
+                                    >
+                                    <span>Kolkata</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Ahmedabad"
+                                    >
+                                    <span>Ahmedabad</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Noida"
+                                    >
+                                    <span>Noida</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Gurugram"
+                                    >
+                                    <span>Gurugram</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Remote"
+                                    >
+                                    <span>Remote</span>
+                                </label>
+
+                                <label class="choice">
+                                    <input
+                                        type="checkbox"
+                                        value="Anywhere in India"
+                                    >
+                                    <span>Anywhere in India</span>
+                                </label>
+
+                            </div>
+
+
+                            <div class="custom-location">
+
+                                <label for="customLocation">
+                                    Other location
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="customLocation"
+                                    placeholder="Add another city or location"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- STIPEND -->
+
+                    <section class="preference-section">
+
+                        <div class="section-number">
+                            03
+                        </div>
+
+                        <div class="section-content">
+
+                            <div class="section-heading">
+
+                                <h2>
+                                    What should the internship offer?
+                                </h2>
+
+                                <p>
+                                    Set the minimum conditions you're
+                                    comfortable with.
+                                </p>
+
+                            </div>
+
+
+                            <div class="preference-grid">
+
+                                <div class="field">
+
+                                    <label>
+                                        Minimum monthly stipend
+                                    </label>
+
+                                    <div class="rupee-input">
+
+                                        <span>₹</span>
+
+                                        <input
+                                            type="number"
+                                            id="stipend"
+                                            min="5000"
+                                            step="1000"
+                                            value="10000"
+                                            required
+                                        >
+
+                                    </div>
+
+                                    <small>
+                                        Minimum allowed: ₹5,000/month
+                                    </small>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Maximum duration
+                                    </label>
+
+                                    <select id="duration">
+
+                                        <option value="Any">
+                                            Any duration
+                                        </option>
+
+                                        <option>
+                                            1 month
+                                        </option>
+
+                                        <option>
+                                            2 months
+                                        </option>
+
+                                        <option>
+                                            3 months
+                                        </option>
+
+                                        <option>
+                                            4 months
+                                        </option>
+
+                                        <option>
+                                            6 months
+                                        </option>
+
+                                        <option>
+                                            12 months
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Paid / unpaid
+                                    </label>
+
+                                    <select id="paymentType">
+
+                                        <option value="Paid only">
+                                            Paid internships only
+                                        </option>
+
+                                        <option value="Any">
+                                            Paid or unpaid
+                                        </option>
+
+                                        <option value="Unpaid">
+                                            Unpaid is okay
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Work arrangement
+                                    </label>
+
+                                    <select id="workMode">
+
+                                        <option value="Any">
+                                            Any
+                                        </option>
+
+                                        <option>
+                                            On-site
+                                        </option>
+
+                                        <option>
+                                            Hybrid
+                                        </option>
+
+                                        <option>
+                                            Remote
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ELIGIBILITY -->
+
+                    <section class="preference-section">
+
+                        <div class="section-number">
+                            04
+                        </div>
+
+                        <div class="section-content">
+
+                            <div class="section-heading">
+
+                                <h2>
+                                    Eligibility & timing
+                                </h2>
+
+                                <p>
+                                    Help us avoid sending opportunities
+                                    you can't apply for.
+                                </p>
+
+                            </div>
+
+
+                            <div class="preference-grid">
+
+                                <div class="field">
+
+                                    <label>
+                                        Current year
+                                    </label>
+
+                                    <select id="studyYear">
+
+                                        <option>
+                                            First year
+                                        </option>
+
+                                        <option selected>
+                                            Second year
+                                        </option>
+
+                                        <option>
+                                            Third year
+                                        </option>
+
+                                        <option>
+                                            Fourth year
+                                        </option>
+
+                                        <option>
+                                            Postgraduate
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Availability
+                                    </label>
+
+                                    <select id="availability">
+
+                                        <option>
+                                            Immediately
+                                        </option>
+
+                                        <option>
+                                            Within 1 month
+                                        </option>
+
+                                        <option>
+                                            Next month
+                                        </option>
+
+                                        <option>
+                                            Flexible
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Application deadline
+                                    </label>
+
+                                    <select id="deadline">
+
+                                        <option>
+                                            Any deadline
+                                        </option>
+
+                                        <option>
+                                            At least 3 days left
+                                        </option>
+
+                                        <option>
+                                            At least 1 week left
+                                        </option>
+
+                                        <option>
+                                            At least 2 weeks left
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Company preference
+                                    </label>
+
+                                    <select id="companyType">
+
+                                        <option>
+                                            Any company
+                                        </option>
+
+                                        <option>
+                                            Startup
+                                        </option>
+
+                                        <option>
+                                            Mid-size company
+                                        </option>
+
+                                        <option>
+                                            Large company
+                                        </option>
+
+                                        <option>
+                                            MNC
+                                        </option>
+
+                                        <option>
+                                            Research organisation
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- EMAIL -->
+
+                    <section class="preference-section">
+
+                        <div class="section-number">
+                            05
+                        </div>
+
+                        <div class="section-content">
+
+                            <div class="section-heading">
+
+                                <h2>
+                                    How should we send your results?
+                                </h2>
+
+                                <p>
+                                    InternFlow's main output is your
+                                    personalized email brief.
+                                </p>
+
+                            </div>
+
+
+                            <div class="email-settings">
+
+                                <div class="email-address-box">
+
+                                    <span class="email-symbol">
+                                        ✉
+                                    </span>
+
+                                    <div>
+
+                                        <small>
+                                            BRIEF WILL BE SENT TO
+                                        </small>
+
+                                        <strong id="preferenceEmail">
+                                            your email
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Email frequency
+                                    </label>
+
+                                    <select id="frequency">
+
+                                        <option>
+                                            Daily
+                                        </option>
+
+                                        <option>
+                                            Every 3 days
+                                        </option>
+
+                                        <option>
+                                            Weekly
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <div class="save-area">
+
+                        <div>
+
+                            <strong>
+                                Ready to start?
+                            </strong>
+
+                            <p>
+                                We'll use these preferences for your
+                                internship matching.
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+                            Save preferences
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </main>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section id="dashboardPage" class="page">
+
+        <div class="app-shell">
+
+            <header class="topbar">
+
+                <div class="brand">
+
+                    <div class="logo">
+                        IF
+                    </div>
+
+                    <strong>
+                        InternFlow
+                    </strong>
+
+                </div>
+
+                <div class="topbar-right">
+
+                    <span
+                        id="userEmail"
+                        class="user-email"
+                    ></span>
+
+                    <button
+                        id="dashboardLogout"
+                        class="logout-btn"
+                    >
+                        Log out
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <main class="dashboard-main">
+
+                <!-- DASHBOARD INTRO -->
+
+                <div class="dashboard-intro">
+
+                    <div>
+
+                        <span class="form-label">
+                            YOUR INTERNFLOW
+                        </span>
+
+                        <h1 id="welcomeText">
+                            Your internship search is active.
+                        </h1>
+
+                        <p>
+                            InternFlow will handle the searching and matching.
+                            You just need to check your inbox.
+                        </p>
+
+                    </div>
+
+                    <div class="active-badge">
+
+                        <span></span>
+
+                        SEARCH ACTIVE
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="status-row">
+
+                    <div class="status-item">
+
+                        <small>
+                            SEARCH
+                        </small>
+
+                        <strong>
+                            Active
+                        </strong>
+
+                        <p>
+                            Automatic internship discovery
+                        </p>
+
+                    </div>
+
+
+                    <div class="status-item">
+
+                        <small>
+                            EMAIL
+                        </small>
+
+                        <strong id="frequencyStatus">
+                            Daily
+                        </strong>
+
+                        <p>
+                            Your selected delivery schedule
+                        </p>
+
+                    </div>
+
+
+                    <div class="status-item">
+
+                        <small>
+                            LAST BRIEF
+                        </small>
+
+                        <strong>
+                            Not sent yet
+                        </strong>
+
+                        <p>
+                            Your first brief will appear here
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MATCHING PROFILE -->
+
+                <section class="dashboard-section">
+
+                    <div class="dashboard-section-head">
+
+                        <div>
+
+                            <span class="form-label">
+                                MATCHING PROFILE
+                            </span>
+
+                            <h2>
+                                Your preferences
+                            </h2>
+
+                        </div>
+
+                        <button
+                            id="editPreferences"
+                            class="edit-btn"
+                        >
+                            Edit
+                        </button>
+
+                    </div>
+
+
+                    <div class="profile-details">
+
+                        <div class="profile-detail large">
+
+                            <small>
+                                SKILLS
+                            </small>
+
+                            <strong id="summarySkills">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail">
+
+                            <small>
+                                DOMAIN
+                            </small>
+
+                            <strong id="summaryDomain">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail">
+
+                            <small>
+                                LOCATIONS
+                            </small>
+
+                            <strong id="summaryLocation">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail">
+
+                            <small>
+                                MINIMUM STIPEND
+                            </small>
+
+                            <strong id="summaryStipend">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail">
+
+                            <small>
+                                WORK MODE
+                            </small>
+
+                            <strong id="summaryWorkMode">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail">
+
+                            <small>
+                                INTERNSHIP TYPE
+                            </small>
+
+                            <strong id="summaryType">
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= AI RESULTS ================= -->
+
+                <section class="dashboard-section">
+
+                    <div class="dashboard-section-head">
+
+                        <div>
+
+                            <span class="form-label">
+                                AI MATCHES
+                            </span>
+
+                            <h2>
+                                Internships found for you
+                            </h2>
+
+                        </div>
+
+                        <span
+                            id="resultsCount"
+                            class="form-label"
+                        >
+                            Searching...
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="internshipResults"
+                        class="internship-results"
+                    >
+
+                        <p class="results-message">
+                            Searching for internships based on your
+                            preferences...
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- EMAIL OUTPUT -->
+
+                <section class="email-output">
+
+                    <div class="output-number">
+                        01
+                    </div>
+
+                    <div class="output-content">
+
+                        <span class="form-label">
+                            THE ACTUAL OUTPUT
+                        </span>
+
+                        <h2>
+                            Relevant internships in your inbox.
+                        </h2>
+
+                        <p>
+                            InternFlow searches the web, extracts internship
+                            information, checks eligibility and compares the
+                            opportunity against your preferences before
+                            including it in your email brief.
+                        </p>
+
+
+                        <div class="output-flow">
+
+                            <span>
+                                Tavily Search
+                            </span>
+
+                            <b>
+                                →
+                            </b>
+
+                            <span>
+                                Gemini
+                            </span>
+
+                            <b>
+                                →
+                            </b>
+
+                            <span>
+                                Matching
+                            </span>
+
+                            <b>
+                                →
+                            </b>
+
+                            <span>
+                                Email
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </section>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
