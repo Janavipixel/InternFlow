@@ -1,3 +1,4 @@
+
 import os
 from dotenv import load_dotenv
 from google import genai
@@ -8,31 +9,43 @@ api_key = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(api_key=api_key)
 
-MODELS = [
-    "gemini-3.6-flash",
-    "gemini-3.5-flash",
-    "gemini-3.5-flash-lite"
-]
 
 def ask_gemini(prompt):
-    for model in MODELS:
-        try:
-            response = client.models.generate_content(
-                model=model,
-                contents=prompt
-            )
 
-            return response.text
+    if not api_key:
+        raise Exception("GEMINI_API_KEY is missing.")
 
-        except Exception as e:
-            error_message = str(e)
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=prompt
+        )
 
-            if "503" in error_message or "429" in error_message:
-                print(f"{model} unavailable/quota exceeded. Trying backup...")
-                continue
-            raise e
+        return response.text
 
-    return None
+    except Exception as e:
+        error_message = str(e).upper()
+
+        # Gemini quota / rate limit
+        if (
+            "429" in error_message
+            or "RESOURCE_EXHAUSTED" in error_message
+            or "QUOTA" in error_message
+            or "RATE LIMIT" in error_message
+        ):
+            print("Gemini quota/rate limit reached.")
+            print("Stopping Gemini request.")
+            return None
+
+        # Temporary Gemini/server problem
+        if "503" in error_message or "UNAVAILABLE" in error_message:
+            print("Gemini service temporarily unavailable.")
+            return None
+
+        # Other Gemini error
+        print("Gemini error:", e)
+        return None
+
 
 if __name__ == "__main__":
     result = ask_gemini("Say hello in one word.")
