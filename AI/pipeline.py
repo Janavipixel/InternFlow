@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import re
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -17,8 +18,6 @@ load_dotenv()
 # ========================================
 # TEMPORARY TEST MODE
 # ========================================
-# True  = Gemini ke bina mock data test karega
-# False = Actual Gemini API use karega
 
 USE_MOCK_GEMINI = False
 
@@ -161,110 +160,503 @@ def remove_duplicate_internships(internships):
 
 
 # ========================================
+# FALLBACK: EXTRACT COMPANY
+# ========================================
+
+def extract_company_from_result(title, url, content):
+
+    clean_title = title.strip()
+
+    # --------------------------------
+    # Common title separators
+    # --------------------------------
+
+    separators = [
+        " — ",
+        " | ",
+        " - ",
+        " – ",
+        " :: "
+    ]
+
+    for separator in separators:
+
+        if separator in clean_title:
+
+            parts = clean_title.split(
+                separator
+            )
+
+            first_part = parts[0].strip()
+
+            if (
+                len(first_part) >= 3
+                and len(first_part) <= 100
+            ):
+
+                return first_part
+
+
+    # --------------------------------
+    # Try common company phrases
+    # --------------------------------
+
+    company_patterns = [
+
+        r"internship\s+at\s+([A-Za-z0-9&.,'() -]{3,80})",
+
+        r"intern\s+at\s+([A-Za-z0-9&.,'() -]{3,80})",
+
+        r"careers\s+at\s+([A-Za-z0-9&.,'() -]{3,80})",
+
+        r"([A-Za-z0-9&.,'() -]{3,80})\s+internship",
+
+    ]
+
+    combined_text = (
+        clean_title + " " + content
+    )
+
+    for pattern in company_patterns:
+
+        match = re.search(
+            pattern,
+            combined_text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            company = match.group(1).strip()
+
+            # Avoid returning overly long sentences
+            company = company.split(".")[0].strip()
+
+            if len(company) >= 3:
+
+                return company
+
+
+    # --------------------------------
+    # Try extracting domain name
+    # --------------------------------
+
+    domain_match = re.search(
+        r"https?://(?:www\.)?([^/]+)",
+        url
+    )
+
+    if domain_match:
+
+        domain = domain_match.group(1)
+
+        domain_parts = domain.split(".")
+
+        if domain_parts:
+
+            company = domain_parts[0]
+
+            if company.lower() not in [
+                "www",
+                "jobs",
+                "careers"
+            ]:
+
+                return company.replace(
+                    "-",
+                    " "
+                ).title()
+
+
+    return "Company information unavailable"
+
+
+# ========================================
+# FALLBACK: EXTRACT ROLE
+# ========================================
+
+def extract_role_from_result(
+    title,
+    content,
+    preferred_domain
+):
+
+    text = (
+        title + " " + content
+    ).lower()
+
+    # More specific roles first
+    role_keywords = [
+
+        "cybersecurity intern",
+        "cyber security intern",
+        "security intern",
+
+        "software development intern",
+        "software developer intern",
+        "software engineering intern",
+        "software intern",
+
+        "python intern",
+        "java intern",
+
+        "web development intern",
+        "web developer intern",
+
+        "data science intern",
+        "data analyst intern",
+        "data intern",
+
+        "machine learning intern",
+        "ai intern",
+
+        "cloud intern",
+        "devops intern",
+
+        "networking intern",
+        "network intern",
+
+        "iot intern",
+
+        "frontend intern",
+        "backend intern",
+        "full stack intern",
+    ]
+
+    for keyword in role_keywords:
+
+        if keyword in text:
+
+            return keyword.title()
+
+
+    # --------------------------------
+    # Domain-based fallback
+    # --------------------------------
+
+    if "cybersecurity" in preferred_domain.lower():
+
+        return "Cybersecurity Intern"
+
+    if "software" in preferred_domain.lower():
+
+        return "Software Intern"
+
+    if "data" in preferred_domain.lower():
+
+        return "Data Intern"
+
+    if "python" in preferred_domain.lower():
+
+        return "Python Intern"
+
+    if "web" in preferred_domain.lower():
+
+        return "Web Development Intern"
+
+
+    return "Internship"
+
+
+# ========================================
+# FALLBACK: EXTRACT SKILLS
+# ========================================
+
+def extract_skills_from_result(
+    title,
+    content,
+    student_skills
+):
+
+    text = (
+        title + " " + content
+    ).lower()
+
+    detected_skills = []
+
+    # Skills we specifically understand
+    known_skills = [
+
+        "python",
+        "java",
+        "javascript",
+        "html",
+        "css",
+        "react",
+        "node.js",
+        "node",
+        "sql",
+        "mongodb",
+
+        "cybersecurity",
+        "cyber security",
+        "networking",
+        "network security",
+        "ethical hacking",
+
+        "linux",
+        "git",
+        "github",
+
+        "cloud",
+        "aws",
+        "azure",
+
+        "docker",
+        "kubernetes",
+
+        "machine learning",
+        "artificial intelligence",
+        "data science",
+
+        "iot",
+        "embedded systems",
+
+        "c",
+        "c++",
+        "oop"
+    ]
+
+
+    # --------------------------------
+    # First check student's skills
+    # --------------------------------
+
+    for skill in student_skills:
+
+        skill_lower = skill.lower().strip()
+
+        if skill_lower in text:
+
+            if skill not in detected_skills:
+
+                detected_skills.append(
+                    skill
+                )
+
+
+    # --------------------------------
+    # Then detect known skills
+    # --------------------------------
+
+    for skill in known_skills:
+
+        if skill in text:
+
+            display_skill = skill
+
+            if skill == "node":
+                display_skill = "Node.js"
+
+            elif skill == "cyber security":
+                display_skill = "Cybersecurity"
+
+            elif skill == "artificial intelligence":
+                display_skill = "AI"
+
+            elif skill == "oop":
+                display_skill = "OOP"
+
+            if display_skill not in detected_skills:
+
+                detected_skills.append(
+                    display_skill
+                )
+
+
+    return detected_skills
+
+
+# ========================================
+# FALLBACK: EXTRACT LOCATION
+# ========================================
+
+def extract_location_from_result(
+    title,
+    content,
+    requested_location
+):
+
+    text = (
+        title + " " + content
+    )
+
+    text_lower = text.lower()
+
+
+    # --------------------------------
+    # Remote
+    # --------------------------------
+
+    if (
+        "remote" in text_lower
+        or "work from home" in text_lower
+        or "wfh" in text_lower
+    ):
+
+        return "Remote"
+
+
+    # --------------------------------
+    # Common Indian locations
+    # --------------------------------
+
+    indian_locations = [
+
+        "Mumbai",
+        "Pune",
+        "Delhi",
+        "New Delhi",
+        "Bangalore",
+        "Bengaluru",
+        "Hyderabad",
+        "Chennai",
+        "Kolkata",
+        "Ahmedabad",
+        "Noida",
+        "Gurugram",
+        "Gurgaon",
+        "Thane",
+        "Navi Mumbai",
+        "Nagpur",
+        "Jaipur",
+        "Indore",
+        "Chandigarh",
+        "Kerala",
+        "Maharashtra",
+        "India"
+    ]
+
+    for city in indian_locations:
+
+        if city.lower() in text_lower:
+
+            return city
+
+
+    # --------------------------------
+    # If Tavily doesn't reveal location
+    # --------------------------------
+
+    return "Location not specified"
+
+
+# ========================================
+# FALLBACK: EXTRACT STIPEND
+# ========================================
+
+def extract_stipend_from_result(
+    content
+):
+
+    text = content.lower()
+
+    stipend_patterns = [
+
+        r"₹\s?[\d,]+(?:\s?-\s?₹?\s?[\d,]+)?",
+
+        r"rs\.?\s?[\d,]+(?:\s?-\s?rs\.?\s?[\d,]+)?",
+
+        r"inr\s?[\d,]+(?:\s?-\s?inr?\s?[\d,]+)?",
+
+    ]
+
+    for pattern in stipend_patterns:
+
+        match = re.search(
+            pattern,
+            text,
+            re.IGNORECASE
+        )
+
+        if match:
+
+            return match.group(0).strip()
+
+
+    return ""
+
+
+# ========================================
 # TAVILY FALLBACK
 # ========================================
-# Used only when Gemini is unavailable.
-#
-# IMPORTANT:
-# We do NOT invent stipend, deadline,
-# duration, eligibility, etc.
-# Those fields remain empty.
-
 
 def create_tavily_fallback(
     title,
     url,
     content,
     location,
-    student_skills
+    student_skills,
+    preferred_domain
 ):
 
-    title_lower = title.lower()
-    content_lower = content.lower()
-
-    # --------------------------------
-    # Try to determine company
-    # --------------------------------
-
-    company = ""
-
-    if " — " in title:
-
-        company = title.split(
-            " — ",
-            1
-        )[0].strip()
-
-    elif " - " in title:
-
-        company = title.split(
-            " - ",
-            1
-        )[0].strip()
-
-    elif " | " in title:
-
-        company = title.split(
-            " | ",
-            1
-        )[0].strip()
-
-    if not company:
-
-        company = "Company from search result"
-
-
-    # --------------------------------
-    # Try to determine role
-    # --------------------------------
-
-    role = "Internship"
-
-    if "cybersecurity" in title_lower:
-
-        role = "Cybersecurity Intern"
-
-    elif "software" in title_lower:
-
-        role = "Software Intern"
-
-    elif "python" in title_lower:
-
-        role = "Python Intern"
-
-    elif "data" in title_lower:
-
-        role = "Data Intern"
-
-    elif "web" in title_lower:
-
-        role = "Web Development Intern"
-
-
-    # --------------------------------
-    # Find skills visible in result
-    # --------------------------------
-
-    matched_possible_skills = []
-
-    combined_text = (
-        title_lower
-        + " "
-        + content_lower
+    print(
+        "Creating structured Tavily fallback..."
     )
 
-    for skill in student_skills:
 
-        if skill.lower() in combined_text:
+    company = extract_company_from_result(
+        title,
+        url,
+        content
+    )
 
-            matched_possible_skills.append(
-                skill
-            )
+
+    role = extract_role_from_result(
+        title,
+        content,
+        preferred_domain
+    )
+
+
+    skills = extract_skills_from_result(
+        title,
+        content,
+        student_skills
+    )
+
+
+    internship_location = extract_location_from_result(
+        title,
+        content,
+        location
+    )
+
+
+    stipend = extract_stipend_from_result(
+        content
+    )
 
 
     # --------------------------------
-    # Return basic internship object
+    # Application status
     # --------------------------------
+
+    text_lower = (
+        title + " " + content
+    ).lower()
+
+    if (
+        "applications are closed" in text_lower
+        or "application closed" in text_lower
+        or "applications closed" in text_lower
+    ):
+
+        application_status = "closed"
+
+    elif (
+        "apply now" in text_lower
+        or "applications open" in text_lower
+        or "currently hiring" in text_lower
+        or "apply for internship" in text_lower
+    ):
+
+        application_status = "open"
+
+    else:
+
+        application_status = "unknown"
+
 
     return {
 
@@ -275,13 +667,13 @@ def create_tavily_fallback(
             role,
 
         "skills":
-            matched_possible_skills,
+            skills,
 
         "location":
-            location,
+            internship_location,
 
         "stipend":
-            "",
+            stipend,
 
         "duration":
             "",
@@ -299,7 +691,7 @@ def create_tavily_fallback(
             "",
 
         "application_status":
-            "unknown"
+            application_status
     }
 
 
@@ -354,11 +746,6 @@ def search_and_process_internships(
     # --------------------------------
     # Tavily search
     # --------------------------------
-    # Reduced memory usage for Render.
-    #
-    # basic search
-    # only 5 results
-    # no raw webpage content
 
     response = tavily.search(
         query=query,
@@ -397,9 +784,6 @@ def search_and_process_internships(
             "url",
             ""
         )
-
-        # raw_content intentionally disabled
-        # to reduce Render memory usage.
 
         content = (
             result.get("content")
@@ -447,7 +831,7 @@ def search_and_process_internships(
 
 
         # ========================================
-        # LIMIT GEMINI API CALLS
+        # STEP 3: Gemini request limit
         # ========================================
 
         if (
@@ -458,12 +842,6 @@ def search_and_process_internships(
 
             print(
                 "Gemini result limit reached."
-            )
-
-            print(
-                f"Maximum "
-                f"{MAX_GEMINI_RESULTS} "
-                f"Gemini requests allowed."
             )
 
             break
@@ -481,7 +859,7 @@ def search_and_process_internships(
 
 
         # ========================================
-        # STEP 3: Gemini prompt
+        # STEP 4: Gemini prompt
         # ========================================
 
         prompt = f"""
@@ -584,7 +962,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 4: Gemini / Mock Gemini
+        # STEP 5: Gemini / Fallback
         # ========================================
 
         if USE_MOCK_GEMINI:
@@ -643,14 +1021,7 @@ WEB PAGE CONTENT:
 
 
                 # ========================================
-                # GEMINI UNAVAILABLE FALLBACK
-                # ========================================
-                #
-                # If Gemini quota is exhausted,
-                # create a basic REAL internship object
-                # using Tavily's result.
-                #
-                # We do NOT make another Gemini request.
+                # GEMINI UNAVAILABLE
                 # ========================================
 
                 if internship is None:
@@ -660,7 +1031,7 @@ WEB PAGE CONTENT:
                     )
 
                     print(
-                        "Using Tavily fallback instead."
+                        "Using structured Tavily fallback."
                     )
 
                     internship = create_tavily_fallback(
@@ -668,13 +1039,16 @@ WEB PAGE CONTENT:
                         url,
                         content,
                         location,
-                        student_skills
+                        student_skills,
+                        preferred_domain
                     )
+
 
                 else:
 
-                    # Wait only when an actual Gemini
-                    # request succeeded.
+                    # Wait only after a successful
+                    # Gemini request.
+
                     time.sleep(13)
 
 
@@ -687,10 +1061,6 @@ WEB PAGE CONTENT:
                 error_text = str(e).upper()
 
 
-                # --------------------------------
-                # Gemini quota / rate-limit error
-                # --------------------------------
-
                 if (
                     "RESOURCE_EXHAUSTED" in error_text
                     or "429" in error_text
@@ -702,41 +1072,30 @@ WEB PAGE CONTENT:
                         "Gemini quota/rate limit reached."
                     )
 
-                    print(
-                        "Using Tavily fallback instead."
-                    )
-
-                    internship = create_tavily_fallback(
-                        title,
-                        url,
-                        content,
-                        location,
-                        student_skills
-                    )
-
-
                 else:
 
-                    # For another Gemini error,
-                    # also use Tavily fallback instead
-                    # of losing the search result.
-
                     print(
-                        "Using Tavily fallback "
-                        "because Gemini failed."
+                        "Gemini failed."
                     )
 
-                    internship = create_tavily_fallback(
-                        title,
-                        url,
-                        content,
-                        location,
-                        student_skills
-                    )
+
+                print(
+                    "Using structured Tavily fallback."
+                )
+
+
+                internship = create_tavily_fallback(
+                    title,
+                    url,
+                    content,
+                    location,
+                    student_skills,
+                    preferred_domain
+                )
 
 
         # ========================================
-        # STEP 5: Clean Gemini response
+        # STEP 6: Clean Gemini response
         # ========================================
 
         if isinstance(
@@ -746,8 +1105,6 @@ WEB PAGE CONTENT:
 
             internship = internship.strip()
 
-
-            # Remove markdown code fences
 
             if internship.startswith("```"):
 
@@ -763,8 +1120,6 @@ WEB PAGE CONTENT:
 
                 internship = internship.strip()
 
-
-            # Convert JSON string to Python object
 
             try:
 
@@ -782,7 +1137,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 6: Handle accidental list
+        # STEP 7: Handle accidental list
         # ========================================
 
         if isinstance(
@@ -807,14 +1162,14 @@ WEB PAGE CONTENT:
         ):
 
             print(
-                "Skipped: Gemini returned invalid object"
+                "Skipped: invalid internship object"
             )
 
             continue
 
 
         # ========================================
-        # STEP 7: Make sure fields exist
+        # STEP 8: Make sure fields exist
         # ========================================
 
         fields = [
@@ -843,7 +1198,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 8: Basic validation
+        # STEP 9: Basic validation
         # ========================================
 
         if (
@@ -859,7 +1214,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 9: Remove closed internships
+        # STEP 10: Remove closed internships
         # ========================================
 
         if (
@@ -875,7 +1230,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 10: Deadline validation
+        # STEP 11: Deadline validation
         # ========================================
 
         deadline = internship["deadline"]
@@ -901,14 +1256,11 @@ WEB PAGE CONTENT:
 
             except ValueError:
 
-                # Unknown date format.
-                # Do not reject automatically.
-
                 pass
 
 
         # ========================================
-        # STEP 11: Stipend filtering
+        # STEP 12: Stipend filtering
         # ========================================
 
         stipend_amount = extract_stipend_amount(
@@ -928,7 +1280,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 12: Location filtering
+        # STEP 13: Location filtering
         # ========================================
 
         internship_location = str(
@@ -940,14 +1292,12 @@ WEB PAGE CONTENT:
         )
 
 
-        # Anywhere in India
-
         if requested_location == "anywhere in india":
 
-            allowed_location = True
+            allowed_location = (
+                internship_location != ""
+            )
 
-
-        # Remote
 
         elif requested_location == "remote":
 
@@ -958,8 +1308,6 @@ WEB PAGE CONTENT:
             )
 
 
-        # Normal location
-
         else:
 
             allowed_location = (
@@ -967,6 +1315,8 @@ WEB PAGE CONTENT:
                 or "remote" in internship_location
                 or "pan india" in internship_location
                 or "india" in internship_location
+                or internship_location
+                == "location not specified"
             )
 
 
@@ -980,7 +1330,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 13: Verify application URL
+        # STEP 14: Verify application URL
         # ========================================
 
         application_url = internship.get(
@@ -1020,7 +1370,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 14: Skill matching
+        # STEP 15: Skill matching
         # ========================================
 
         internship_skills = internship[
@@ -1048,7 +1398,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 15: Add matching information
+        # STEP 16: Add matching information
         # ========================================
 
         internship[
@@ -1073,7 +1423,7 @@ WEB PAGE CONTENT:
 
 
         # ========================================
-        # STEP 16: Add final result
+        # STEP 17: Add final result
         # ========================================
 
         internships.append(
@@ -1083,12 +1433,13 @@ WEB PAGE CONTENT:
         print(
             f"Added: "
             f"{internship['company']} - "
-            f"{internship['role']}"
+            f"{internship['role']} "
+            f"({match_percentage}% match)"
         )
 
 
     # ========================================
-    # STEP 17: Remove duplicates
+    # STEP 18: Remove duplicates
     # ========================================
 
     internships = remove_duplicate_internships(
@@ -1097,7 +1448,7 @@ WEB PAGE CONTENT:
 
 
     # ========================================
-    # STEP 18: Sort by match percentage
+    # STEP 19: Sort by match percentage
     # ========================================
 
     internships.sort(
@@ -1208,3 +1559,4 @@ if __name__ == "__main__":
                 f"Missing Skills: "
                 f"{internship['missing_skills']}"
             )
+
