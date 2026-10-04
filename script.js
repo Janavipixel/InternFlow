@@ -15,7 +15,11 @@ const editPreferences = document.getElementById("editPreferences");
 
 const STORAGE_KEY = "internflow_user";
 
-const API_URL = "https://internflow-3rpb.onrender.com";
+/*
+   Frontend and backend are hosted
+   on the same Render service.
+*/
+const API_URL = "";
 
 
 /* =========================================
@@ -79,7 +83,6 @@ loginForm.addEventListener("submit", function(event) {
 
     event.preventDefault();
 
-
     const name =
         document.getElementById("loginName").value.trim();
 
@@ -89,14 +92,11 @@ loginForm.addEventListener("submit", function(event) {
     const password =
         document.getElementById("loginPassword").value.trim();
 
-
     if (!name || !email || !password) {
         return;
     }
 
-
     const oldUser = getUser();
-
 
     if (
         oldUser &&
@@ -115,7 +115,6 @@ loginForm.addEventListener("submit", function(event) {
         return;
     }
 
-
     const user = {
 
         name: name,
@@ -126,13 +125,10 @@ loginForm.addEventListener("submit", function(event) {
 
     };
 
-
     saveUser(user);
-
 
     document.getElementById("preferenceEmail").textContent =
         email;
-
 
     showPage(preferencesPage);
 
@@ -150,9 +146,7 @@ function getSelectedLocations() {
             '.location-grid input[type="checkbox"]:checked'
         );
 
-
     const locations = [];
-
 
     checked.forEach(function(item) {
 
@@ -160,19 +154,16 @@ function getSelectedLocations() {
 
     });
 
-
     const custom =
         document.getElementById("customLocation")
             .value
             .trim();
-
 
     if (custom) {
 
         locations.push(custom);
 
     }
-
 
     return locations;
 
@@ -191,14 +182,11 @@ async function searchInternships(user) {
     const resultsCount =
         document.getElementById("resultsCount");
 
-
     if (!resultsContainer || !resultsCount) {
         return;
     }
 
-
     resultsCount.textContent = "Searching...";
-
 
     resultsContainer.innerHTML = `
         <p class="results-message">
@@ -206,9 +194,7 @@ async function searchInternships(user) {
         </p>
     `;
 
-
     const preferences = user.preferences;
-
 
     try {
 
@@ -239,7 +225,6 @@ async function searchInternships(user) {
             }
         );
 
-
         if (!response.ok) {
 
             throw new Error(
@@ -248,12 +233,9 @@ async function searchInternships(user) {
 
         }
 
-
         const data = await response.json();
 
-
         displayInternships(data.internships || []);
-
 
     } catch (error) {
 
@@ -262,9 +244,7 @@ async function searchInternships(user) {
             error
         );
 
-
         resultsCount.textContent = "Search failed";
-
 
         resultsContainer.innerHTML = `
             <p class="results-message">
@@ -290,15 +270,12 @@ function displayInternships(internships) {
     const resultsCount =
         document.getElementById("resultsCount");
 
-
     if (!resultsContainer || !resultsCount) {
         return;
     }
 
-
     resultsCount.textContent =
         `${internships.length} found`;
-
 
     if (internships.length === 0) {
 
@@ -313,9 +290,7 @@ function displayInternships(internships) {
 
     }
 
-
     resultsContainer.innerHTML = "";
-
 
     internships.forEach(function(internship) {
 
@@ -323,7 +298,6 @@ function displayInternships(internships) {
             document.createElement("article");
 
         card.className = "internship-card";
-
 
         const company =
             internship.company || "Company not available";
@@ -345,24 +319,20 @@ function displayInternships(internships) {
             internship.source_url ||
             "#";
 
-
         const skills =
             Array.isArray(internship.skills)
                 ? internship.skills.join(", ")
                 : internship.skills || "Not specified";
-
 
         const matchedSkills =
             Array.isArray(internship.matched_skills)
                 ? internship.matched_skills.join(", ")
                 : "None";
 
-
         const missingSkills =
             Array.isArray(internship.missing_skills)
                 ? internship.missing_skills.join(", ")
                 : "None";
-
 
         card.innerHTML = `
 
@@ -380,7 +350,6 @@ function displayInternships(internships) {
 
                 </div>
 
-
                 <div class="match-badge">
 
                     ${match !== undefined && match !== null
@@ -390,7 +359,6 @@ function displayInternships(internships) {
                 </div>
 
             </div>
-
 
             <div class="internship-meta">
 
@@ -404,7 +372,6 @@ function displayInternships(internships) {
 
             </div>
 
-
             <div class="internship-skills">
 
                 <strong>
@@ -416,7 +383,6 @@ function displayInternships(internships) {
                 </p>
 
             </div>
-
 
             <div class="internship-match-details">
 
@@ -432,7 +398,6 @@ function displayInternships(internships) {
 
                 </div>
 
-
                 <div>
 
                     <strong>
@@ -446,7 +411,6 @@ function displayInternships(internships) {
                 </div>
 
             </div>
-
 
             <div class="internship-card-bottom">
 
@@ -472,7 +436,6 @@ function displayInternships(internships) {
             </div>
 
         `;
-
 
         resultsContainer.appendChild(card);
 
@@ -514,9 +477,7 @@ preferencesForm.addEventListener(
 
         event.preventDefault();
 
-
         const user = getUser();
-
 
         if (!user) {
 
@@ -526,12 +487,10 @@ preferencesForm.addEventListener(
 
         }
 
-
         const stipend =
             Number(
                 document.getElementById("stipend").value
             );
-
 
         /*
            Never allow an unrealistic
@@ -550,10 +509,8 @@ preferencesForm.addEventListener(
 
         }
 
-
         const locations =
             getSelectedLocations();
-
 
         if (locations.length === 0) {
 
@@ -565,14 +522,12 @@ preferencesForm.addEventListener(
 
         }
 
-
         const skills =
             document.getElementById("skills")
                 .value
                 .split(",")
                 .map(skill => skill.trim())
                 .filter(skill => skill.length > 0);
-
 
         user.preferences = {
 
@@ -613,7 +568,6 @@ preferencesForm.addEventListener(
                 document.getElementById("frequency").value
 
         };
-
 
         saveUser(user);
 
@@ -687,6 +641,7 @@ preferencesForm.addEventListener(
             );
 
         }
+
         /*
            Show dashboard first so the user
            can see the search progress.
@@ -695,7 +650,6 @@ preferencesForm.addEventListener(
         loadDashboard(user);
 
         showPage(dashboardPage);
-
 
         /*
            Now call the Flask AI pipeline.
@@ -717,52 +671,40 @@ function loadDashboard(user) {
         return;
     }
 
-
     document.getElementById("userEmail").textContent =
         user.email;
 
-
     const preferences =
         user.preferences;
-
 
     if (!preferences) {
         return;
     }
 
-
     document.getElementById("welcomeText").textContent =
         `Your internship search is active, ${user.name}.`;
-
 
     document.getElementById("summarySkills").textContent =
         preferences.student_skills.join(", ");
 
-
     document.getElementById("summaryDomain").textContent =
         preferences.preferred_domain;
 
-
     document.getElementById("summaryLocation").textContent =
         preferences.locations.join(", ");
-
 
     document.getElementById("summaryStipend").textContent =
         "₹" +
         preferences.minimum_stipend.toLocaleString("en-IN");
 
-
     document.getElementById("summaryWorkMode").textContent =
         preferences.work_mode;
-
 
     document.getElementById("summaryType").textContent =
         preferences.internship_type;
 
-
     document.getElementById("frequencyStatus").textContent =
         preferences.email_frequency;
-
 
     document.getElementById("preferenceEmail").textContent =
         user.email;
@@ -778,7 +720,6 @@ editPreferences.addEventListener("click", function() {
 
     const user = getUser();
 
-
     if (!user || !user.preferences) {
 
         showPage(preferencesPage);
@@ -787,57 +728,43 @@ editPreferences.addEventListener("click", function() {
 
     }
 
-
     const p = user.preferences;
-
 
     document.getElementById("skills").value =
         p.student_skills.join(", ");
 
-
     document.getElementById("domain").value =
         p.preferred_domain;
-
 
     document.getElementById("internshipType").value =
         p.internship_type;
 
-
     document.getElementById("stipend").value =
         p.minimum_stipend;
-
 
     document.getElementById("duration").value =
         p.maximum_duration;
 
-
     document.getElementById("paymentType").value =
         p.payment_type;
-
 
     document.getElementById("workMode").value =
         p.work_mode;
 
-
     document.getElementById("studyYear").value =
         p.study_year;
-
 
     document.getElementById("availability").value =
         p.availability;
 
-
     document.getElementById("deadline").value =
         p.deadline;
-
 
     document.getElementById("companyType").value =
         p.company_preference;
 
-
     document.getElementById("frequency").value =
         p.email_frequency;
-
 
     /*
        Clear all location checkboxes first.
@@ -853,7 +780,6 @@ editPreferences.addEventListener("click", function() {
                 p.locations.includes(box.value);
 
         });
-
 
     /*
        Anything that isn't one of the
@@ -878,21 +804,17 @@ editPreferences.addEventListener("click", function() {
 
     ];
 
-
     const customLocations =
         p.locations.filter(
             location =>
                 !predefinedLocations.includes(location)
         );
 
-
     document.getElementById("customLocation").value =
         customLocations.join(", ");
 
-
     document.getElementById("preferenceEmail").textContent =
         user.email;
-
 
     showPage(preferencesPage);
 
@@ -927,7 +849,6 @@ dashboardLogout.addEventListener("click", logout);
 
 const existingUser = getUser();
 
-
 if (existingUser) {
 
     if (existingUser.preferences) {
@@ -950,4 +871,3 @@ if (existingUser) {
     showPage(loginPage);
 
 }
-
