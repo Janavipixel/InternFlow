@@ -1,7 +1,6 @@
 /* =========================================
    INTERNFLOW
-   Updated Visual Identity
-   Warm Earthy + Sage
+   Warm Earthy + Sage Visual Identity
 ========================================= */
 
 * {
@@ -1089,6 +1088,508 @@ select:focus {
 }
 
 
+/* ========================================
+   AI INTERNSHIP RESULTS
+   Premium InternFlow Cards
+======================================== */
+
+.internship-results {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+
+    margin-top: 28px;
+}
+
+
+/* ========================================
+   INTERNSHIP CARD
+======================================== */
+
+.internship-card {
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #FFFDFC 0%,
+            #F7F1E8 100%
+        );
+
+    border: 1px solid #DED1C1;
+
+    border-radius: 22px;
+
+    padding: 27px;
+
+    box-shadow:
+        0 8px 20px rgba(73, 63, 53, 0.07),
+        0 2px 5px rgba(73, 63, 53, 0.04);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+/* Decorative circle */
+
+.internship-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 150px;
+    height: 150px;
+
+    top: -75px;
+    right: -55px;
+
+    background: var(--sage-soft);
+
+    border-radius: 50%;
+
+    opacity: 0.25;
+
+    pointer-events: none;
+}
+
+
+/* Colored top line */
+
+.internship-card::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6F8A68,
+            #AAB29A,
+            #C5A88A
+        );
+}
+
+
+.internship-card:hover {
+    transform: translateY(-6px);
+
+    border-color: #B9AA96;
+
+    box-shadow:
+        0 18px 38px rgba(73, 63, 53, 0.13),
+        0 5px 12px rgba(73, 63, 53, 0.06);
+}
+
+
+/* ========================================
+   CARD HEADER
+======================================== */
+
+.internship-card-header {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+
+.internship-company {
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    padding: 5px 9px;
+
+    background: #E4EBDD;
+
+    border: 1px solid #CFD9C7;
+
+    border-radius: 7px;
+
+    color: #53694D;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.1px;
+
+    text-transform: uppercase;
+}
+
+
+.internship-role {
+    margin: 0;
+
+    max-width: 390px;
+
+    color: #3D342D;
+
+    font-size: 23px;
+
+    font-weight: 850;
+
+    line-height: 1.22;
+
+    letter-spacing: -0.7px;
+}
+
+
+/* ========================================
+   MATCH BADGE
+======================================== */
+
+.match-badge {
+    position: relative;
+
+    z-index: 2;
+
+    flex-shrink: 0;
+
+    min-width: 78px;
+
+    padding: 11px 12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #718B69,
+            #5D7657
+        );
+
+    color: white;
+
+    border: none;
+
+    border-radius: 13px;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    box-shadow:
+        0 5px 12px rgba(93, 118, 87, 0.22);
+}
+
+
+/* ========================================
+   LOCATION + STIPEND
+======================================== */
+
+.internship-meta {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    margin-bottom: 22px;
+}
+
+
+.internship-meta-item {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 36px;
+
+    padding: 7px 12px;
+
+    background: #FFF9F1;
+
+    border: 1px solid #E1D5C5;
+
+    border-radius: 10px;
+
+    color: #5B5047;
+
+    font-size: 11px;
+
+    font-weight: 750;
+
+    box-shadow:
+        0 2px 5px rgba(73, 63, 53, 0.03);
+}
+
+
+/* ========================================
+   SKILLS
+======================================== */
+
+.internship-skills {
+    position: relative;
+
+    z-index: 2;
+
+    margin-bottom: 21px;
+
+    padding: 15px;
+
+    background: rgba(255, 255, 255, 0.58);
+
+    border: 1px solid #E3D9CB;
+
+    border-radius: 13px;
+}
+
+
+.internship-skills-title {
+    margin-bottom: 10px;
+
+    color: #82766A;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+
+.skill-list {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+
+.skill-tag {
+    padding: 7px 10px;
+
+    background: #EEF2EA;
+
+    border: 1px solid #D3DDCD;
+
+    border-radius: 8px;
+
+    color: #53664E;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease;
+}
+
+
+.skill-tag:hover {
+    background: #E1E9DC;
+
+    border-color: #B9C8B1;
+
+    transform: translateY(-1px);
+}
+
+
+/* ========================================
+   MATCH DETAILS
+======================================== */
+
+.match-details {
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 23px;
+}
+
+
+.match-column {
+    min-height: 78px;
+
+    padding: 14px;
+
+    border-radius: 12px;
+}
+
+
+.match-column.matched {
+    background:
+        linear-gradient(
+            145deg,
+            #EAF1E6,
+            #E3ECDE
+        );
+
+    border: 1px solid #D2DFCB;
+}
+
+
+.match-column.missing {
+    background:
+        linear-gradient(
+            145deg,
+            #F3ECE4,
+            #EEE4D9
+        );
+
+    border: 1px solid #E2D5C6;
+}
+
+
+.match-column-title {
+    margin-bottom: 7px;
+
+    color: #587052;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.match-column.missing .match-column-title {
+    color: #92745A;
+}
+
+
+.match-column-text {
+    margin: 0;
+
+    color: #51463E;
+
+    font-size: 11px;
+
+    line-height: 1.55;
+}
+
+
+/* ========================================
+   APPLY BUTTON
+======================================== */
+
+.internship-apply {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    padding-top: 3px;
+}
+
+
+.internship-apply a {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    min-height: 43px;
+
+    padding: 0 19px;
+
+    background: #3F3933;
+
+    color: #FFFDF9;
+
+    border-radius: 11px;
+
+    text-decoration: none;
+
+    font-size: 11px;
+
+    font-weight: 850;
+
+    box-shadow:
+        0 4px 10px rgba(63, 57, 51, 0.12);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.internship-apply a:hover {
+    background: #6F8A68;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(111, 138, 104, 0.25);
+}
+
+
+/* ========================================
+   EMPTY / SEARCHING STATE
+======================================== */
+
+.results-message {
+    grid-column: 1 / -1;
+
+    padding: 45px 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #FFFDF9,
+            #F4EDE3
+        );
+
+    border: 1px dashed #CDBEAD;
+
+    border-radius: 20px;
+
+    color: #5B5047;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+
 /* =========================================
    RESPONSIVE
 ========================================= */
@@ -1318,39 +1819,6 @@ select:focus {
 
 
 /* =========================================
-   VERY SMALL PHONES
-========================================= */
-
-@media (max-width: 400px) {
-
-    .login-form-area {
-        padding: 25px 18px;
-    }
-
-    .login-form-wrapper h2 {
-        font-size: 28px;
-    }
-
-    .form-description {
-        font-size: 12px;
-    }
-
-    .mobile-brand {
-        margin-bottom: 24px;
-    }
-
-    .mobile-brand .logo {
-        width: 34px;
-        height: 34px;
-    }
-
-    .location-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-
-/* =========================================
    CLEAN MOBILE LOGIN
 ========================================= */
 
@@ -1364,8 +1832,6 @@ select:focus {
 
         background: var(--white);
     }
-
-    /* TOP VISUAL */
 
     .login-visual {
         display: block;
@@ -1473,9 +1939,6 @@ select:focus {
     .visual-footer {
         display: none;
     }
-
-
-    /* FORM */
 
     .login-form-area {
         display: flex;
@@ -1613,405 +2076,6 @@ select:focus {
 
 
 /* ========================================
-   AI INTERNSHIP RESULTS
-   Premium Internship Cards
-======================================== */
-
-.internship-results {
-    display: grid;
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 22px;
-
-    margin-top: 26px;
-}
-
-
-/* ========================================
-   CARD
-======================================== */
-
-.internship-card {
-    position: relative;
-
-    overflow: hidden;
-
-    background: var(--white);
-
-    border: 1px solid #DDD7CC;
-
-    border-radius: 20px;
-
-    padding: 25px;
-
-    box-shadow:
-        0 8px 25px rgba(73, 63, 53, 0.06);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
-}
-
-
-/* Colored accent */
-
-.internship-card::before {
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 4px;
-
-    background: linear-gradient(
-        90deg,
-        var(--sage),
-        var(--sage-soft),
-        #C5A88A
-    );
-}
-
-
-.internship-card:hover {
-    transform: translateY(-5px);
-
-    border-color: var(--sage-soft);
-
-    box-shadow:
-        0 16px 35px rgba(73, 63, 53, 0.12);
-}
-
-
-/* ========================================
-   CARD HEADER
-======================================== */
-
-.internship-card-header {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: flex-start;
-
-    gap: 18px;
-
-    margin-bottom: 20px;
-}
-
-
-.internship-company {
-    margin: 0 0 7px;
-
-    color: var(--sage);
-
-    font-size: 11px;
-
-    font-weight: 900;
-
-    letter-spacing: 1.2px;
-
-    text-transform: uppercase;
-}
-
-
-.internship-role {
-    margin: 0;
-
-    max-width: 390px;
-
-    color: var(--dark);
-
-    font-size: 22px;
-
-    font-weight: 800;
-
-    line-height: 1.25;
-
-    letter-spacing: -0.5px;
-}
-
-
-/* ========================================
-   MATCH BADGE
-======================================== */
-
-.match-badge {
-    flex-shrink: 0;
-
-    min-width: 66px;
-
-    padding: 9px 11px;
-
-    border-radius: 12px;
-
-    background: var(--sage-light);
-
-    color: var(--green);
-
-    font-size: 13px;
-
-    font-weight: 900;
-
-    text-align: center;
-
-    border: 1px solid var(--sage-soft);
-}
-
-
-/* ========================================
-   LOCATION + STIPEND
-======================================== */
-
-.internship-meta {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-bottom: 21px;
-}
-
-
-.internship-meta-item {
-    display: inline-flex;
-
-    align-items: center;
-
-    min-height: 34px;
-
-    padding: 7px 11px;
-
-    background: #F1ECE4;
-
-    border: 1px solid #E3DDD3;
-
-    border-radius: 9px;
-
-    color: var(--dark);
-
-    font-size: 11px;
-
-    font-weight: 700;
-}
-
-
-/* ========================================
-   SKILLS
-======================================== */
-
-.internship-skills {
-    margin-bottom: 20px;
-}
-
-
-.internship-skills-title {
-    margin-bottom: 10px;
-
-    color: #8A8176;
-
-    font-size: 9px;
-
-    font-weight: 900;
-
-    letter-spacing: 1.2px;
-
-    text-transform: uppercase;
-}
-
-
-.skill-list {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 7px;
-}
-
-
-.skill-tag {
-    padding: 6px 10px;
-
-    background: var(--white);
-
-    border: 1px solid #D8D1C7;
-
-    border-radius: 8px;
-
-    color: var(--dark);
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
-}
-
-
-.skill-tag:hover {
-    background: var(--sage-light);
-
-    border-color: var(--sage-soft);
-}
-
-
-/* ========================================
-   MATCH DETAILS
-======================================== */
-
-.match-details {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    margin-bottom: 22px;
-}
-
-
-.match-column {
-    min-height: 72px;
-
-    padding: 13px;
-
-    border-radius: 11px;
-
-    border: 1px solid transparent;
-}
-
-
-.match-column.matched {
-    background: #EDF1E9;
-
-    border-color: #DCE5D7;
-}
-
-
-.match-column.missing {
-    background: #F3EFE9;
-
-    border-color: #E5DED4;
-}
-
-
-.match-column-title {
-    margin-bottom: 7px;
-
-    color: var(--green);
-
-    font-size: 9px;
-
-    font-weight: 900;
-
-    letter-spacing: 1px;
-
-    text-transform: uppercase;
-}
-
-
-.match-column.missing .match-column-title {
-    color: #8B7560;
-}
-
-
-.match-column-text {
-    margin: 0;
-
-    color: var(--dark);
-
-    font-size: 11px;
-
-    line-height: 1.55;
-}
-
-
-/* ========================================
-   APPLY BUTTON
-======================================== */
-
-.internship-apply {
-    display: flex;
-
-    justify-content: flex-end;
-
-    padding-top: 2px;
-}
-
-
-.internship-apply a {
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 8px;
-
-    min-height: 40px;
-
-    padding: 0 17px;
-
-    background: var(--dark);
-
-    color: var(--white);
-
-    border-radius: 10px;
-
-    text-decoration: none;
-
-    font-size: 11px;
-
-    font-weight: 800;
-
-    transition:
-        background 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-.internship-apply a:hover {
-    background: var(--sage);
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 7px 16px rgba(111, 138, 104, 0.22);
-}
-
-
-/* ========================================
-   EMPTY / SEARCHING STATE
-======================================== */
-
-.results-message {
-    grid-column: 1 / -1;
-
-    padding: 38px 25px;
-
-    background: var(--white);
-
-    border: 1px dashed #CFC7BA;
-
-    border-radius: 18px;
-
-    color: var(--dark);
-
-    text-align: center;
-
-    font-size: 13px;
-}
-
-
-/* ========================================
    INTERNSHIP MOBILE
 ======================================== */
 
@@ -2020,21 +2084,23 @@ select:focus {
     .internship-results {
         grid-template-columns: 1fr;
 
-        gap: 17px;
+        gap: 18px;
     }
 
     .internship-card {
-        padding: 21px;
+        padding: 22px;
+
+        border-radius: 19px;
     }
 
     .internship-card-header {
         flex-direction: column;
 
-        gap: 12px;
+        gap: 13px;
     }
 
     .internship-role {
-        font-size: 20px;
+        font-size: 21px;
     }
 
     .match-badge {
@@ -2064,13 +2130,13 @@ select:focus {
 @media (max-width: 400px) {
 
     .internship-card {
-        padding: 18px;
+        padding: 19px;
 
-        border-radius: 16px;
+        border-radius: 17px;
     }
 
     .internship-role {
-        font-size: 18px;
+        font-size: 19px;
     }
 
     .internship-meta-item {
@@ -2081,4 +2147,3 @@ select:focus {
         font-size: 10px;
     }
 }
-
