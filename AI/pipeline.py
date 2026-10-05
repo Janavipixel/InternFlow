@@ -1,6 +1,5 @@
 import os
 import json
-import time
 import re
 from datetime import datetime
 
@@ -1044,12 +1043,7 @@ WEB PAGE CONTENT:
                     )
 
 
-                else:
-
-                    # Wait only after a successful
-                    # Gemini request.
-
-                    time.sleep(13)
+                
 
 
             except Exception as e:

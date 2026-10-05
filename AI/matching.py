@@ -1,8 +1,10 @@
 def normalize_skill(skill):
 
+    if skill is None:
+        return ""
+
     skill = str(skill).lower().strip()
 
-    # Common variations
     replacements = {
         "vulnerability assessments": "vulnerability assessment",
         "penetration testing": "penetration testing",
@@ -25,13 +27,9 @@ def normalize_skill(skill):
         "ids/ips": "ids/ips",
     }
 
-    # Replace hyphens with spaces
     skill = skill.replace("-", " ")
-
-    # Remove extra spaces
     skill = " ".join(skill.split())
 
-    # Apply known replacement
     skill = replacements.get(
         skill,
         skill
@@ -40,66 +38,43 @@ def normalize_skill(skill):
     return skill
 
 
-def skills_match(
-    student_skill,
-    internship_skill
-):
+def skills_match(student_skill, internship_skill):
 
-    student = normalize_skill(
-        student_skill
-    )
+    student = normalize_skill(student_skill)
+    internship = normalize_skill(internship_skill)
 
-    internship = normalize_skill(
-        internship_skill
-    )
+    if not student or not internship:
+        return False
 
-
-    # --------------------------------
     # Exact match
-    # --------------------------------
-
     if student == internship:
-
         return True
 
+    # Single-letter skills such as C should
+    # not use substring matching.
+    if len(student) == 1 or len(internship) == 1:
+        return False
 
-    # --------------------------------
-    # Phrase containment
-    # --------------------------------
-    #
-    # Example:
-    #
-    # Cybersecurity
-    # cybersecurity concepts
-    #
-    # Network
-    # networking
-    #
-    # --------------------------------
-
+    # Phrase containment for multi-word skills.
     if (
         student in internship
         or internship in student
     ):
-
         return True
-
 
     return False
 
 
-def calculate_match(
-    student_skills,
-    internship_skills
-):
+def calculate_match(student_skills, internship_skills):
+
+    if not isinstance(student_skills, list):
+        student_skills = []
+
+    if not isinstance(internship_skills, list):
+        internship_skills = []
 
     matched_skills = []
     missing_skills = []
-
-
-    # --------------------------------
-    # FIND MATCHED SKILLS
-    # --------------------------------
 
     for student_skill in student_skills:
 
@@ -110,21 +85,14 @@ def calculate_match(
                 internship_skill
             ):
 
-                matched_skills.append(
-                    student_skill
-                )
+                if student_skill not in matched_skills:
+                    matched_skills.append(student_skill)
 
                 break
-
-
-    # --------------------------------
-    # FIND MISSING SKILLS
-    # --------------------------------
 
     for internship_skill in internship_skills:
 
         found = False
-
 
         for student_skill in student_skills:
 
@@ -134,27 +102,16 @@ def calculate_match(
             ):
 
                 found = True
-
                 break
 
-
-        if not found:
-
-            missing_skills.append(
-                internship_skill
-            )
-
-
-    # --------------------------------
-    # CALCULATE MATCH %
-    # --------------------------------
+        if not found and internship_skill not in missing_skills:
+            missing_skills.append(internship_skill)
 
     if len(internship_skills) > 0:
 
         match_percentage = (
             len(matched_skills)
-            /
-            len(internship_skills)
+            / len(internship_skills)
         ) * 100
 
         match_percentage = round(
@@ -163,9 +120,7 @@ def calculate_match(
         )
 
     else:
-
         match_percentage = None
-
 
     return (
         matched_skills,
