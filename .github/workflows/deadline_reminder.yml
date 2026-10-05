@@ -29,6 +29,8 @@ jobs:
 
       - name: Run deadline automation
         env:
-          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-        run: python automation.py
+              EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+              EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+              RENDER_BACKEND_URL: ${{ secrets.RENDER_BACKEND_URL }}
+              AUTOMATION_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+            run: python automation.py
