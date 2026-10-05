@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install python-dotenv requests
+        run: pip install python-dotenv requests tavily-python
 
       - name: Restore database
         env:
