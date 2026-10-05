@@ -21,6 +21,12 @@ jobs:
       - name: Install dependencies
         run: pip install python-dotenv
 
+      - name: Restore database
+        env:
+          DATABASE_B64: ${{ secrets.DATABASE_B64 }}
+        run: |
+          echo "$DATABASE_B64" | base64 --decode > internflow.db
+
       - name: Run deadline automation
         env:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
