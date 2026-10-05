@@ -1,138 +1,371 @@
-import sqlite3
 import os
+import sqlite3
 import smtplib
-from datetime import date, datetime
-from email.message import EmailMessage
+import requests
+
+from datetime import date, datetime, timedelta
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from dotenv import load_dotenv
+
+from AI.pipeline import search_and_process_internships
+
+
+# =========================================
+# LOAD ENVIRONMENT VARIABLES
+# =========================================
 
 load_dotenv("AI/.env")
 
 DATABASE = os.getenv("DATABASE", "internflow.db")
 
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+RENDER_BACKEND_URL = os.getenv("RENDER_BACKEND_URL")
+AUTOMATION_TOKEN = os.getenv("AUTOMATION_TOKEN")
 
-# --------------------------------
-# Get all students
-# --------------------------------
+
+# =========================================
+# DATABASE CONNECTION
+# =========================================
+
+def get_db_connection():
+
+    connection = sqlite3.connect(DATABASE)
+
+    connection.row_factory = sqlite3.Row
+
+    return connection
+
+
+# =========================================
+# GET STUDENTS
+# =========================================
 
 def get_students():
 
-    connection = sqlite3.connect(DATABASE)
-    connection.row_factory = sqlite3.Row
+    if not RENDER_BACKEND_URL:
+        print("ERROR: RENDER_BACKEND_URL is not configured.")
+        return []
 
-    students = connection.execute("""
-        SELECT *
-        FROM student_preferences
-    """).fetchall()
+    if not AUTOMATION_TOKEN:
+        print("ERROR: AUTOMATION_TOKEN is not configured.")
+        return []
 
-    connection.close()
+    try:
 
-    return students
+        response = requests.get(
+            f"{RENDER_BACKEND_URL}/automation/students",
+            headers={
+                "X-Automation-Token": AUTOMATION_TOKEN
+            },
+            timeout=30
+        )
 
+        if response.status_code != 200:
 
-# --------------------------------
-# Get internships with upcoming deadlines
-# --------------------------------
+            print(
+                "Failed to fetch students from Render:",
+                response.status_code,
+                response.text
+            )
 
-def get_upcoming_deadlines():
+            return []
 
-    connection = sqlite3.connect(DATABASE)
-    connection.row_factory = sqlite3.Row
+        return response.json()
 
-    internships = connection.execute("""
-        SELECT *
-        FROM internships
-        WHERE deadline IS NOT NULL
-        AND deadline != ''
-    """).fetchall()
+    except Exception as error:
 
-    connection.close()
+        print(
+            "Error connecting to Render:",
+            error
+        )
 
-    today = date.today()
-    upcoming = []
-
-    for internship in internships:
-
-        try:
-            deadline = datetime.strptime(
-                internship["deadline"],
-                "%Y-%m-%d"
-            ).date()
-
-        except ValueError:
-            continue
-
-        days_left = (deadline - today).days
-
-        # Only internships whose deadline
-        # is today or within the next 7 days
-        if 0 <= days_left <= 7:
-
-            upcoming.append({
-                "company": internship["company"],
-                "role": internship["role"],
-                "skills": internship["skills"] or "Not specified",
-                "location": internship["location"] or "Not specified",
-                "stipend": internship["stipend"] or "Not specified",
-                "eligibility": internship["eligibility"] or "Not specified",
-                "deadline": internship["deadline"],
-                "days_left": days_left,
-                "application_link": (
-                    internship["application_link"]
-                    or "Not available"
-                ),
-                "match_percentage": internship["match_percentage"]
-            })
-
-    return upcoming
+        return []
 
 
-# --------------------------------
-# Check whether email is due
-# --------------------------------
+# =========================================
+# PARSE STUDENT SKILLS
+# =========================================
+
+def parse_skills(skills):
+
+    if not skills:
+        return []
+
+    if isinstance(skills, list):
+        return skills
+
+    return [
+        skill.strip()
+        for skill in skills.split(",")
+        if skill.strip()
+    ]
+
+
+# =========================================
+# CHECK IF EMAIL SHOULD BE SENT
+# =========================================
 
 def should_send_email(student):
 
-    frequency = (
-        student["email_frequency"] or ""
-    ).lower().strip()
+    frequency = student["email_frequency"]
 
-    last_email_sent = student["last_email_sent"]
+    last_sent = student["last_email_sent"]
 
-    # First email
-    if not last_email_sent:
+    today = date.today()
+
+    # -------------------------------------
+    # No previous email
+    # -------------------------------------
+
+    if not last_sent:
+
         return True
 
     try:
+
         last_sent_date = datetime.strptime(
-            last_email_sent,
+            last_sent,
             "%Y-%m-%d"
         ).date()
 
     except ValueError:
-        return True
 
-    today = date.today()
+        return True
 
     days_since_last_email = (
         today - last_sent_date
     ).days
 
-    if frequency == "daily":
+    # -------------------------------------
+    # Daily
+    # -------------------------------------
+
+    if frequency == "Daily":
+
         return days_since_last_email >= 1
 
-    if frequency == "weekly":
+    # -------------------------------------
+    # Weekly
+    # -------------------------------------
+
+    if frequency == "Weekly":
+
         return days_since_last_email >= 7
 
-    return False
+    # -------------------------------------
+    # Default
+    # -------------------------------------
+
+    return True
 
 
-# --------------------------------
-# Update last email date
-# --------------------------------
+# =========================================
+# GET UPCOMING DEADLINES
+# =========================================
+
+def get_upcoming_deadlines(results):
+
+    today = date.today()
+
+    last_day = today + timedelta(days=7)
+
+    upcoming = []
+
+    for internship in results:
+
+        deadline = internship.get("deadline")
+
+        if not deadline:
+
+            continue
+
+        try:
+
+            deadline_date = datetime.strptime(
+                deadline,
+                "%Y-%m-%d"
+            ).date()
+
+        except ValueError:
+
+            continue
+
+        # ---------------------------------
+        # Deadline must be today → 7 days
+        # ---------------------------------
+
+        if today <= deadline_date <= last_day:
+
+            internship_copy = dict(internship)
+
+            internship_copy["days_left"] = (
+                deadline_date - today
+            ).days
+
+            upcoming.append(internship_copy)
+
+    return upcoming
+
+
+# =========================================
+# SEND EMAIL
+# =========================================
+
+def send_email(student, internships):
+
+    if not internships:
+
+        print(
+            f"No matching internships for "
+            f"{student['email']}."
+        )
+
+        return False
+
+    subject = (
+        "InternFlow - Internship Deadline Reminder"
+    )
+
+    body = []
+
+    body.append(
+        f"Hi {student['name'] or 'Student'},"
+    )
+
+    body.append("")
+
+    body.append(
+        "Here are internship opportunities matching "
+        "your preferences and having deadlines within "
+        "the next 7 days:"
+    )
+
+    body.append("")
+
+    for internship in internships:
+
+        body.append(
+            f"Company: {internship.get('company', 'N/A')}"
+        )
+
+        body.append(
+            f"Role: {internship.get('role', 'N/A')}"
+        )
+
+        body.append(
+            f"Location: {internship.get('location', 'N/A')}"
+        )
+
+        body.append(
+            f"Stipend: {internship.get('stipend', 'N/A')}"
+        )
+
+        body.append(
+            f"Deadline: {internship.get('deadline', 'N/A')}"
+        )
+
+        body.append(
+            f"Days left: {internship.get('days_left', 'N/A')}"
+        )
+
+        body.append(
+            f"Match: "
+            f"{internship.get('match_percentage', 'N/A')}%"
+        )
+
+        matched = internship.get(
+            "matched_skills",
+            []
+        )
+
+        if matched:
+
+            body.append(
+                "Matched skills: "
+                + ", ".join(matched)
+            )
+
+        body.append(
+            "Application: "
+            + internship.get(
+                "application_url",
+                "N/A"
+            )
+        )
+
+        body.append("")
+
+        body.append("------------------------------")
+
+        body.append("")
+
+    body.append(
+        "Apply before the deadline!"
+    )
+
+    body.append("")
+
+    body.append(
+        "This email was automatically generated "
+        "by InternFlow."
+    )
+
+    message = MIMEMultipart()
+
+    message["From"] = EMAIL_ADDRESS
+
+    message["To"] = student["email"]
+
+    message["Subject"] = subject
+
+    message.attach(
+        MIMEText(
+            "\n".join(body),
+            "plain"
+        )
+    )
+
+    try:
+
+        with smtplib.SMTP_SSL(
+            "smtp.gmail.com",
+            465
+        ) as server:
+
+            server.login(
+                EMAIL_ADDRESS,
+                EMAIL_PASSWORD
+            )
+
+            server.send_message(message)
+
+        print(
+            f"Email sent successfully to "
+            f"{student['email']}"
+        )
+
+        return True
+
+    except Exception as error:
+
+        print(
+            f"Failed to send email to "
+            f"{student['email']}: {error}"
+        )
+
+        return False
+
+
+# =========================================
+# UPDATE LAST EMAIL SENT
+# =========================================
 
 def update_last_email_sent(student_id):
 
-    connection = sqlite3.connect(DATABASE)
+    connection = get_db_connection()
 
     connection.execute("""
         UPDATE student_preferences
@@ -144,199 +377,238 @@ def update_last_email_sent(student_id):
     ))
 
     connection.commit()
+
     connection.close()
 
 
-# --------------------------------
-# Send email
-# --------------------------------
+# =========================================
+# PROCESS ONE STUDENT
+# =========================================
 
-def send_email(student_email, deadlines):
+def process_student(student):
 
-    sender = os.getenv("EMAIL_ADDRESS")
-    password = os.getenv("EMAIL_PASSWORD")
+    print()
 
-    message = EmailMessage()
-
-    message["Subject"] = (
-        "InternFlow - Internship Opportunities"
+    print("================================")
+    print(
+        f"Checking {student['email']}"
     )
-
-    message["From"] = sender
-    message["To"] = student_email
-
-    body = "Hello!\n\n"
-
-    body += (
-        "Here are your upcoming internship "
-        "opportunities from InternFlow:\n\n"
-    )
-
-    for internship in deadlines:
-
-        body += "━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-
-        body += (
-            f"Company: {internship['company']}\n"
-        )
-
-        body += (
-            f"Role: {internship['role']}\n"
-        )
-
-        body += (
-            f"Skills: {internship['skills']}\n"
-        )
-
-        body += (
-            f"Location: {internship['location']}\n"
-        )
-
-        body += (
-            f"Stipend: {internship['stipend']}\n"
-        )
-
-        body += (
-            f"Eligibility: {internship['eligibility']}\n"
-        )
-
-        # Match percentage
-        match = internship["match_percentage"]
-
-        if match is None:
-            match = "Not available"
-        else:
-            match = f"{match}%"
-
-        body += f"Match: {match}\n"
-
-        body += (
-            f"Deadline: {internship['deadline']}\n"
-        )
-
-        body += (
-            f"Days left: {internship['days_left']}\n"
-        )
-
-        body += (
-            f"Apply: {internship['application_link']}\n\n"
-        )
-
-    body += "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-
-    body += (
-        "Good luck with your applications!\n\n"
-    )
-
-    body += "InternFlow"
-
-    message.set_content(body)
-
-    # Gmail SMTP
-    with smtplib.SMTP_SSL(
-        "smtp.gmail.com",
-        465
-    ) as server:
-
-        server.login(
-            sender,
-            password
-        )
-
-        server.send_message(message)
+    print("================================")
 
     print(
-        f"Email sent successfully to "
-        f"{student_email}!"
+        "Email frequency:",
+        student["email_frequency"]
     )
 
+    # -------------------------------------
+    # Check frequency
+    # -------------------------------------
 
-# --------------------------------
-# Main automation
-# --------------------------------
-
-if __name__ == "__main__":
-
-    print(
-        "Starting InternFlow email automation..."
-    )
-
-    students = get_students()
-
-    if not students:
+    if not should_send_email(student):
 
         print(
-            "No student preferences found."
+            "Email not due yet."
         )
 
-        exit()
+        return
+
+    # -------------------------------------
+    # Student preferences
+    # -------------------------------------
+
+    student_skills = parse_skills(
+        student["student_skills"]
+    )
+
+    preferred_domain = (
+        student["preferred_domain"]
+        or ""
+    )
+
+    locations = parse_skills(
+        student["locations"]
+    )
+
+    minimum_stipend = (
+        student["minimum_stipend"]
+        or 0
+    )
+
+    if not student_skills:
+
+        print(
+            "No student skills found."
+        )
+
+        return
+
+    if not preferred_domain:
+
+        print(
+            "No preferred domain found."
+        )
+
+        return
+
+    if not locations:
+
+        print(
+            "No preferred location found."
+        )
+
+        return
+
+    # -------------------------------------
+    # Run AI pipeline
+    # -------------------------------------
+
+    all_results = []
+
+    for location in locations:
+
+        print(
+            f"Searching internships for "
+            f"location: {location}"
+        )
+
+        try:
+
+            results = (
+                search_and_process_internships(
+                    student_skills,
+                    preferred_domain,
+                    location,
+                    minimum_stipend
+                )
+            )
+
+            if results:
+
+                all_results.extend(results)
+
+        except Exception as error:
+
+            print(
+                f"Pipeline error for "
+                f"{student['email']}: {error}"
+            )
+
+    # -------------------------------------
+    # Remove duplicate internships
+    # -------------------------------------
+
+    unique_results = []
+
+    seen = set()
+
+    for internship in all_results:
+
+        key = (
+            internship.get("company"),
+            internship.get("role"),
+            internship.get("location")
+        )
+
+        if key in seen:
+
+            continue
+
+        seen.add(key)
+
+        unique_results.append(internship)
+
+    # -------------------------------------
+    # Deadline filtering
+    # -------------------------------------
+
+    upcoming = get_upcoming_deadlines(
+        unique_results
+    )
+
+    print(
+        f"Found {len(unique_results)} "
+        f"matching internship(s)."
+    )
+
+    print(
+        f"{len(upcoming)} have deadlines "
+        f"within the next 7 days."
+    )
+
+    # -------------------------------------
+    # Send email
+    # -------------------------------------
+
+    if upcoming:
+
+        sent = send_email(
+            student,
+            upcoming
+        )
+
+        if sent:
+
+            update_last_email_sent(
+                student["id"]
+            )
+
+    else:
+
+        print(
+            f"No upcoming matching deadlines "
+            f"for {student['email']}."
+        )
+
+
+# =========================================
+# MAIN
+# =========================================
+
+def main():
+
+    print()
+    print("================================")
+    print("InternFlow Deadline Automation")
+    print("================================")
+    print()
+
+    if not EMAIL_ADDRESS:
+
+        print(
+            "ERROR: EMAIL_ADDRESS is not configured."
+        )
+
+        return
+
+    if not EMAIL_PASSWORD:
+
+        print(
+            "ERROR: EMAIL_PASSWORD is not configured."
+        )
+
+        return
+
+    students = get_students()
 
     print(
         f"Found {len(students)} student(s)."
     )
 
-    deadlines = get_upcoming_deadlines()
-
-    if not deadlines:
-
-        print(
-            "No upcoming internship deadlines."
-        )
-
-        exit()
-
-    print(
-        f"Found {len(deadlines)} "
-        "upcoming internships."
-    )
-
-    # Send email to each student
     for student in students:
 
-        email = student["email"]
+        process_student(student)
 
-        frequency = (
-            student["email_frequency"]
-            or "Not specified"
-        )
+    print()
 
-        print(
-            f"\nChecking {email} "
-            f"(frequency: {frequency})"
-        )
+    print("================================")
+    print("Automation completed.")
+    print("================================")
 
-        # Check daily / weekly frequency
-        if not should_send_email(student):
 
-            print(
-                f"Skipping {email} - "
-                "email not due yet."
-            )
+# =========================================
+# START
+# =========================================
 
-            continue
+if __name__ == "__main__":
 
-        try:
-
-            send_email(
-                email,
-                deadlines
-            )
-
-            # Only update the date
-            # after successful email
-            update_last_email_sent(
-                student["id"]
-            )
-
-            print(
-                f"Last email date updated "
-                f"for {email}."
-            )
-
-        except Exception as error:
-
-            print(
-                f"Failed to send email to "
-                f"{email}: {error}"
-            )
-
+    main()

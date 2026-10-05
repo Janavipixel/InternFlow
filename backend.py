@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
+import os
 from flask_cors import CORS
 import sqlite3
 from datetime import date, datetime
@@ -436,7 +437,70 @@ def upcoming_deadlines():
 
     return jsonify(upcoming)
 
+# =========================================
+# AUTOMATION - GET STUDENT PREFERENCES
+# =========================================
 
+@app.route("/automation/students", methods=["GET"])
+def automation_students():
+
+    token = request.headers.get("X-Automation-Token")
+
+    expected_token = os.getenv("AUTOMATION_TOKEN")
+
+    if not expected_token or token != expected_token:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    connection = get_db_connection()
+
+    students = connection.execute("""
+        SELECT *
+        FROM student_preferences
+    """).fetchall()
+
+    connection.close()
+
+    return jsonify([
+        dict(student)
+        for student in students
+    ])
+
+
+# =========================================
+# AUTOMATION - UPDATE EMAIL DATE
+# =========================================
+
+@app.route("/automation/email-sent/<int:student_id>", methods=["PUT"])
+def automation_email_sent(student_id):
+
+    token = request.headers.get("X-Automation-Token")
+
+    expected_token = os.getenv("AUTOMATION_TOKEN")
+
+    if not expected_token or token != expected_token:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    connection = get_db_connection()
+
+    connection.execute("""
+        UPDATE student_preferences
+        SET last_email_sent = ?
+        WHERE id = ?
+    """, (
+        date.today().isoformat(),
+        student_id
+    ))
+
+    connection.commit()
+    connection.close()
+
+    return jsonify({
+        "message": "Email date updated successfully"
+    })
 # =========================================
 # RUN SERVER
 # =========================================
