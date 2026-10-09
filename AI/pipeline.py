@@ -1284,7 +1284,8 @@ WEB PAGE CONTENT:
         requested_location = (
             location.lower().strip()
         )
-
+        print("Extracted internship location:", repr(internship.get("location")))
+        print("Student preferred location:", repr(location))
 
         if requested_location == "anywhere in india":
 
