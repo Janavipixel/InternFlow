@@ -26,10 +26,14 @@ jobs:
         run: |
           echo "$DATABASE_B64" | base64 --decode > internflow.db
 
+      
       - name: Run deadline automation
         env:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RENDER_BACKEND_URL: ${{ secrets.RENDER_BACKEND_URL }}
           AUTOMATION_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python automation.py
+
