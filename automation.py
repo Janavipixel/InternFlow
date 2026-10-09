@@ -43,8 +43,8 @@ def get_db_connection():
 # GET STUDENTS
 # =========================================
 
-def get_students():
 
+def get_students():
     if not RENDER_BACKEND_URL:
         print("ERROR: RENDER_BACKEND_URL is not configured.")
         return []
@@ -54,34 +54,37 @@ def get_students():
         return []
 
     try:
+        url = f"{RENDER_BACKEND_URL.rstrip('/')}/automation/students"
+        print("Fetching students from Render API...")
 
         response = requests.get(
-            f"{RENDER_BACKEND_URL}/automation/students",
-            headers={
-                "X-Automation-Token": AUTOMATION_TOKEN
-            },
+            url,
+            headers={"X-Automation-Token": AUTOMATION_TOKEN},
             timeout=30
         )
 
+        print("Render API status:", response.status_code)
+
         if response.status_code != 200:
-
-            print(
-                "Failed to fetch students from Render:",
-                response.status_code,
-                response.text
-            )
-
+            print("Render API error:", response.text[:500])
             return []
 
-        return response.json()
+        students = response.json()
+
+        if not isinstance(students, list):
+            print("ERROR: Expected a list from Render API.")
+            print("Response type:", type(students).__name__)
+            return []
+
+        print("Students returned by Render:", len(students))
+
+        if len(students) == 0:
+            print("No student records exist in the database used by Render.")
+
+        return students
 
     except Exception as error:
-
-        print(
-            "Error connecting to Render:",
-            error
-        )
-
+        print("Error fetching students:", repr(error))
         return []
 
 
