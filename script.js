@@ -680,9 +680,10 @@ preferencesForm.addEventListener("submit", async function(event) {
 
     saveUser(user);
 
+    let welcomeTriggered = false;
     try {
         const apiUrl = await getApiUrl();
-        await fetch(`${apiUrl}/save-preferences`, {
+        const saveResp = await fetch(`${apiUrl}/save-preferences`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -703,13 +704,21 @@ preferencesForm.addEventListener("submit", async function(event) {
                 email_frequency: user.preferences.email_frequency
             })
         });
+        if (saveResp.ok) {
+            const data = await saveResp.json();
+            welcomeTriggered = !!data.welcome_email_triggered;
+        }
     } catch (error) {
         console.error("Could not save preferences to backend:", error);
     }
 
     loadDashboard(user);
     showPage(dashboardPage);
-    showToast("Preferences saved successfully! Discovering matching opportunities...", "success");
+    if (welcomeTriggered) {
+        showToast("Preferences saved! Your initial personalized brief is on its way to your inbox.", "success");
+    } else {
+        showToast("Preferences saved successfully! Discovering matching opportunities...", "success");
+    }
     await searchInternships(user);
 });
 

@@ -38,6 +38,7 @@ def test_save_preferences_endpoint(client):
     assert response.status_code == 200
     data = response.get_json()
     assert "saved successfully" in data["message"]
+    assert data.get("welcome_email_triggered") is True
 
     # Verify invalid email rejected
     bad_response = client.post("/save-preferences", json={"name": "No Email"})
@@ -172,6 +173,7 @@ def test_trigger_test_email_endpoint(mock_process, client):
     })
 
     # Mock process_student returning success
+    mock_process.reset_mock()
     mock_process.return_value = "accepted_by_provider"
     resp_success = client.post("/automation/trigger-test", json={"email": "runner@example.com"})
     assert resp_success.status_code == 200

@@ -1,4 +1,5 @@
 import os
+import threading
 import concurrent.futures
 from datetime import date, datetime, timezone
 from dotenv import load_dotenv
@@ -162,6 +163,14 @@ def save_preferences():
     connection = get_db_connection()
     try:
         cursor = connection.cursor()
+
+        # Check if student is new or has never received an email brief
+        existing = cursor.execute(
+            "SELECT id, last_email_sent FROM student_preferences WHERE email = ?",
+            (email.strip(),)
+        ).fetchone()
+        is_first_time = (existing is None) or (existing["last_email_sent"] is None)
+
         cursor.execute("""
             INSERT INTO student_preferences (
                 name,
@@ -215,7 +224,29 @@ def save_preferences():
             data.get("email_frequency")
         ))
         connection.commit()
-        return jsonify({"message": "Preferences saved successfully!"})
+
+        # Retrieve saved record with allocated student ID
+        saved_student = dict(cursor.execute(
+            "SELECT * FROM student_preferences WHERE email = ?",
+            (email.strip(),)
+        ).fetchone())
+
+        # If this is a first-time registration, dispatch welcome brief immediately in background
+        if is_first_time:
+            def trigger_instant_welcome(student_payload):
+                try:
+                    from automation import process_student
+                    print(f"[Registration] Instant welcome brief initiated for {student_payload.get('email')}...")
+                    process_student(student_payload, force=True)
+                except Exception as bg_err:
+                    print(f"[Registration] Background welcome brief note: {bg_err}")
+
+            threading.Thread(target=trigger_instant_welcome, args=(saved_student,), daemon=True).start()
+
+        return jsonify({
+            "message": "Preferences saved successfully!",
+            "welcome_email_triggered": is_first_time
+        })
     finally:
         connection.close()
 
