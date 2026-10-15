@@ -366,7 +366,13 @@ def send_email(student, internships, max_retries=2):
         except (OSError, socket.error) as err:
             err_msg = str(err)
             errno_val = getattr(err, "errno", None)
-            if errno_val == 101 or "network is unreachable" in err_msg.lower() or "timed out" in err_msg.lower() or errno_val == 110:
+            if (
+                errno_val in (22, 101, 110, 111, 113)
+                or "network is unreachable" in err_msg.lower()
+                or "timed out" in err_msg.lower()
+                or "invalid argument" in err_msg.lower()
+                or "connection refused" in err_msg.lower()
+            ):
                 cloud_block_msg = "Render Free Tier blocks outbound SMTP ports (465/587). Email automation runs via GitHub Actions runner or locally (http://127.0.0.1:5000), or via RESEND_API_KEY (HTTP port 443)."
                 print(f"[Automation] Cloud SMTP port restriction: {cloud_block_msg}")
                 return False, "CLOUD_SMTP_BLOCKED", cloud_block_msg

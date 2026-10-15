@@ -655,7 +655,13 @@ def trigger_test_email():
             except Exception:
                 pass
 
-            if provider_code == "CLOUD_SMTP_BLOCKED" or "Render Free Tier blocks" in reason or "network is unreachable" in reason.lower():
+            if (
+                provider_code == "CLOUD_SMTP_BLOCKED"
+                or "Render Free Tier blocks" in reason
+                or "network is unreachable" in reason.lower()
+                or "invalid argument" in reason.lower()
+                or "errno 22" in reason.lower()
+            ):
                 return jsonify({
                     "success": False,
                     "status": "cloud_smtp_blocked",
@@ -668,9 +674,22 @@ def trigger_test_email():
                 "message": f"Email delivery failed: {reason}. Please ensure EMAIL_ADDRESS and EMAIL_PASSWORD (Gmail App Password) are added to your Render Environment Variables."
             }), 500
     except Exception as err:
+        err_str = str(err)
+        print(f"[Automation] Unhandled trigger-test error: {err_str}")
+        if (
+            "errno 22" in err_str.lower()
+            or "invalid argument" in err_str.lower()
+            or "network is unreachable" in err_str.lower()
+            or "connection refused" in err_str.lower()
+        ):
+            return jsonify({
+                "success": False,
+                "status": "cloud_smtp_blocked",
+                "message": "Render's Free Tier blocks outgoing SMTP ports (465 & 587) to prevent spam. Emails are designed to be sent automatically via the scheduled GitHub Actions runner in your repo or when running locally on your computer at http://127.0.0.1:5000. (To send directly from Render, you can also add a free RESEND_API_KEY)."
+            }), 200
         return jsonify({
             "success": False,
-            "error": f"Internal automation error: {str(err)}"
+            "error": f"Internal automation error: {err_str}"
         }), 500
 
 
