@@ -1,6 +1,12 @@
 import os
 import concurrent.futures
 from datetime import date, datetime, timezone
+from dotenv import load_dotenv
+
+# Load environment configuration (.env and AI/.env)
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "AI", ".env"))
+load_dotenv()
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
