@@ -1,72 +1,37 @@
-from pipeline import search_and_process_internships
+try:
+    from AI.pipeline import search_and_process_internships
+except ImportError:
+    from pipeline import search_and_process_internships
 
 
-# --------------------------------
-# Temporary student information
-# --------------------------------
+def run_pipeline_test():
+    student_skills = ["Python", "Cybersecurity", "Linux"]
+    preferred_domain = "Cybersecurity"
+    location = "Mumbai"
+    minimum_stipend = 15000
 
-student_skills = [
-    "Python",
-    "Cybersecurity",
-    "Linux"
-]
+    results = search_and_process_internships(
+        student_skills,
+        preferred_domain,
+        location,
+        minimum_stipend
+    )
 
-preferred_domain = "Cybersecurity"
+    print("\n================================")
+    print("FINAL INTERNSHIP RESULTS")
+    print("================================")
+    print("Total internships:", len(results))
 
-location = "Mumbai"
-
-minimum_stipend = 15000
-
-
-# --------------------------------
-# Run AI pipeline
-# --------------------------------
-
-results = search_and_process_internships(
-    student_skills,
-    preferred_domain,
-    location,
-    minimum_stipend
-)
-
-
-# --------------------------------
-# Display results
-# --------------------------------
-
-print("\n================================")
-print("FINAL INTERNSHIP RESULTS")
-print("================================")
-
-print("Total internships:", len(results))
+    for internship in results:
+        print("\n--------------------------------")
+        print("Company:", internship.get("company"))
+        print("Role:", internship.get("role"))
+        print("Skills:", internship.get("skills"))
+        print("Location:", internship.get("location"))
+        print("Stipend:", internship.get("stipend"))
+        print("Application URL:", internship.get("application_url"))
+        print("Match percentage:", internship.get("match_percentage"))
 
 
-for internship in results:
-
-    print("\n--------------------------------")
-
-    print("Company:", internship["company"])
-
-    print("Role:", internship["role"])
-
-    print("Skills:", internship["skills"])
-
-    print("Location:", internship["location"])
-
-    print("Stipend:", internship["stipend"])
-
-    print("Stipend amount:", internship["stipend_amount"])
-
-    print("Duration:", internship["duration"])
-
-    print("Deadline:", internship["deadline"])
-
-    print("Eligibility:", internship["eligibility"])
-
-    print("Application URL:", internship["application_url"])
-
-    print("Matched skills:", internship["matched_skills"])
-
-    print("Missing skills:", internship["missing_skills"])
-
-    print("Match percentage:", internship["match_percentage"])
+if __name__ == "__main__":
+    run_pipeline_test()

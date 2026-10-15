@@ -18,15 +18,19 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install python-dotenv requests tavily-python google-genai
+        run: pip install -r requirements.txt
 
       - name: Restore database
         env:
           DATABASE_B64: ${{ secrets.DATABASE_B64 }}
         run: |
-          echo "$DATABASE_B64" | base64 --decode > internflow.db
+          if [ -n "$DATABASE_B64" ]; then
+            echo "Restoring database from secret..."
+            echo "$DATABASE_B64" | base64 --decode > internflow.db
+          else
+            echo "DATABASE_B64 secret not set; using local/cloud synchronization."
+          fi
 
-      
       - name: Run deadline automation
         env:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
@@ -35,5 +39,8 @@ jobs:
           AUTOMATION_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AUTOMATION_TEST_MODE: ${{ vars.AUTOMATION_TEST_MODE || 'false' }}
+          TEST_EMAIL_RECIPIENT: ${{ secrets.TEST_EMAIL_RECIPIENT }}
         run: python automation.py
+
 

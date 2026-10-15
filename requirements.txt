@@ -4,3 +4,5 @@ python-dotenv
 tavily-python
 google-genai
 gunicorn
+requests
+pytest

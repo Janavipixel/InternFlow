@@ -2,15 +2,19 @@ import os
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
-load_dotenv()
 
-api_key = os.getenv("TAVILY_API_KEY")
+def run_test():
+    load_dotenv()
+    api_key = os.getenv("TAVILY_API_KEY")
+    print("Tavily Key loaded:", bool(api_key))
+    if not api_key:
+        print("TAVILY_API_KEY is not set.")
+        return
 
-print("Key loaded:", api_key is not None)
-print("Key prefix:", api_key[:5] if api_key else None)
+    client = TavilyClient(api_key=api_key)
+    response = client.search("cybersecurity internships Mumbai", max_results=2)
+    print("Results count:", len(response.get("results", [])))
 
-client = TavilyClient(api_key=api_key)
 
-response = client.search("cybersecurity internships Mumbai")
-
-print(response)
+if __name__ == "__main__":
+    run_test()

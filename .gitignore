@@ -1,5 +1,26 @@
+# Python virtual environments
 venv/
+.venv/
+env/
+
+# Python cache & artifacts
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.pytest_cache/
+
+# Environment and secrets
 .env
+.env.*
+!.env.example
+AI/.env
+
+# Databases & local sqlite
 *.db
+*.sqlite3
+
+# Logs & temp files
+*.log
+temp_*
+db_base64.txt
