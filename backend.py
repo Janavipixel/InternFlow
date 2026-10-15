@@ -599,8 +599,15 @@ def trigger_test_email():
                 "status": "skipped_incomplete_preferences",
                 "message": "Preferences are incomplete. Please specify skills, preferred domain, and location."
             })
+        elif outcome == "cloud_smtp_blocked":
+            return jsonify({
+                "success": False,
+                "status": "cloud_smtp_blocked",
+                "message": "Render's Free Tier blocks outgoing SMTP ports (465 & 587) to prevent spam. Emails are designed to be sent automatically via the scheduled GitHub Actions runner in your repo or when running locally on your computer at http://127.0.0.1:5000. (To send directly from Render, you can also add a free RESEND_API_KEY)."
+            }), 200
         else:
             reason = "EMAIL_ADDRESS or EMAIL_PASSWORD not configured"
+            provider_code = ""
             try:
                 conn = get_db_connection()
                 last_log = conn.execute(
@@ -608,12 +615,21 @@ def trigger_test_email():
                     (f"%{email[-10:]}", student.get("id"))
                 ).fetchone()
                 conn.close()
-                if last_log and last_log["error_category"]:
-                    reason = last_log["error_category"]
-                elif last_log and last_log["provider_status_code"]:
-                    reason = f"SMTP Code {last_log['provider_status_code']}"
+                if last_log:
+                    provider_code = last_log["provider_status_code"] or ""
+                    if last_log["error_category"]:
+                        reason = last_log["error_category"]
+                    elif last_log["provider_status_code"]:
+                        reason = f"SMTP Code {last_log['provider_status_code']}"
             except Exception:
                 pass
+
+            if provider_code == "CLOUD_SMTP_BLOCKED" or "Render Free Tier blocks" in reason or "network is unreachable" in reason.lower():
+                return jsonify({
+                    "success": False,
+                    "status": "cloud_smtp_blocked",
+                    "message": "Render's Free Tier blocks outgoing SMTP ports (465 & 587) to prevent spam. Emails are designed to be sent automatically via the scheduled GitHub Actions runner in your repo or when running locally on your computer at http://127.0.0.1:5000. (To send directly from Render, you can also add a free RESEND_API_KEY)."
+                }), 200
 
             return jsonify({
                 "success": False,

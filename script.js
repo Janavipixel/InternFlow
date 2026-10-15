@@ -879,6 +879,12 @@ if (triggerTestEmailBtn) {
                     feedbackEl.innerHTML = `<strong>Dispatch Complete:</strong> ${escapeHTML(data.message)}`;
                 }
                 showToast("Brief delivered to inbox", "success");
+            } else if (data.status === "cloud_smtp_blocked") {
+                if (feedbackEl) {
+                    feedbackEl.className = "action-feedback-box feedback-warning";
+                    feedbackEl.innerHTML = `<strong>Cloud Hosting Notice:</strong> ${escapeHTML(data.message)}`;
+                }
+                showToast("Render Free Tier blocks raw SMTP ports", "info");
             } else {
                 if (feedbackEl) {
                     feedbackEl.className = "action-feedback-box feedback-warning";

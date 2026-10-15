@@ -129,6 +129,44 @@ def test_send_email_auth_failure(mock_smtp, monkeypatch):
     assert err == "Authentication failure"
 
 
+@patch("smtplib.SMTP_SSL")
+def test_send_email_cloud_smtp_blocked(mock_smtp, monkeypatch):
+    monkeypatch.setattr(automation, "EMAIL_ADDRESS", "sender@example.com")
+    monkeypatch.setattr(automation, "EMAIL_PASSWORD", "secret")
+    monkeypatch.setattr(automation, "AUTOMATION_TEST_MODE", False)
+    monkeypatch.delenv("RESEND_API_KEY", raising=False)
+
+    mock_smtp.side_effect = OSError(101, "Network is unreachable")
+
+    student = {"name": "Student", "email": "student@example.com"}
+    internships = [{"company": "Meta", "role": "Intern"}]
+
+    success, code, err = send_email(student, internships)
+    assert success is False
+    assert code == "CLOUD_SMTP_BLOCKED"
+    assert "Render Free Tier blocks outbound SMTP ports" in err
+
+
+@patch("requests.post")
+def test_send_email_resend_http_success(mock_post, monkeypatch):
+    monkeypatch.setenv("RESEND_API_KEY", "re_test_key_123")
+    monkeypatch.setattr(automation, "AUTOMATION_TEST_MODE", False)
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_post.return_value = mock_response
+
+    student = {"name": "Student", "email": "student@example.com"}
+    internships = [{"company": "Meta", "role": "Intern"}]
+
+    success, code, err = send_email(student, internships)
+    assert success is True
+    assert code == "250_ACCEPTED"
+    assert err is None
+    mock_post.assert_called_once()
+    assert "https://api.resend.com/emails" in mock_post.call_args[0][0]
+
+
 def test_get_students_fallback(monkeypatch):
     # Mock Render returning failure, local returning student
     mock_local_student = [{"id": 1, "name": "Local Student", "email": "local@test.com"}]
