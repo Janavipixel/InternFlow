@@ -594,10 +594,25 @@ def trigger_test_email():
                 "message": "Preferences are incomplete. Please specify skills, preferred domain, and location."
             })
         else:
+            reason = "EMAIL_ADDRESS or EMAIL_PASSWORD not configured"
+            try:
+                conn = get_db_connection()
+                last_log = conn.execute(
+                    "SELECT provider_status_code, error_category FROM email_logs WHERE recipient_email_masked LIKE ? OR student_id = ? ORDER BY id DESC LIMIT 1",
+                    (f"%{email[-10:]}", student.get("id"))
+                ).fetchone()
+                conn.close()
+                if last_log and last_log["error_category"]:
+                    reason = last_log["error_category"]
+                elif last_log and last_log["provider_status_code"]:
+                    reason = f"SMTP Code {last_log['provider_status_code']}"
+            except Exception:
+                pass
+
             return jsonify({
                 "success": False,
                 "status": outcome,
-                "message": f"Email delivery could not be completed (status: {outcome})."
+                "message": f"Email delivery failed: {reason}. Please ensure EMAIL_ADDRESS and EMAIL_PASSWORD (Gmail App Password) are added to your Render Environment Variables."
             }), 500
     except Exception as err:
         return jsonify({
